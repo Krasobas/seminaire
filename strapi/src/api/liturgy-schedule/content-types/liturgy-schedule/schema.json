@@ -19,6 +19,9 @@
       "type": "datetime",
       "required": true
     },
+    "time": {
+      "type": "string"
+    },
     "description": {
       "type": "text"
     },

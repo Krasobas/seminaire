@@ -9,27 +9,20 @@ import AdmissionsBanner from '../components/AdmissionsBanner.astro';
 import VisitSection from '../components/VisitSection.astro';
 import DonateSection from '../components/DonateSection.astro';
 import Footer from '../components/Footer.astro';
-import { getNews, getFeaturedArticle, getLiturgySchedule, getEpisodes, getSiteSettings } from '../lib/strapi';
+import { getSiteSettings } from '../lib/strapi';
 import '../styles/global.css';
 
-const [news, featured, liturgy, episodes, settings] = await Promise.all([
-  getNews(5),
-  getFeaturedArticle(),
-  getLiturgySchedule(),
-  getEpisodes(3),
-  getSiteSettings(),
-]);
-
-const adminTheme = settings?.attributes?.theme || 'light';
+const settings = await getSiteSettings();
+const adminTheme = settings?.theme || 'light';
 ---
 
 <BaseLayout title="Séminaire Orthodoxe Russe Sainte-Geneviève" adminTheme={adminTheme}>
   <Header />
   <main>
     <Hero />
-    <NewsSection articles={news} featured={featured} />
-    <LiturgySection schedule={liturgy} />
-    <EmissionSection episodes={episodes} />
+    <NewsSection />
+    <LiturgySection />
+    <EmissionSection />
     <AdmissionsBanner />
     <VisitSection />
     <DonateSection />

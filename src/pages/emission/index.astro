@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getAllEpisodes } from '../../lib/strapi';
+import { getAllEpisodes, formatDate } from '../../lib/strapi';
+import type { Episode } from '../../lib/strapi';
 
 const result = await getAllEpisodes();
 const episodes = result?.data || [];
@@ -15,39 +16,29 @@ const episodes = result?.data || [];
     {episodes.length === 0 ? (
       <div class="empty-state">
         <p>Aucun épisode pour le moment.</p>
+        <a href="https://www.youtube.com/@seminaireorthodoxe" target="_blank" rel="noopener" class="btn btn-light">
+          Découvrir sur YouTube →
+        </a>
       </div>
     ) : (
       <div class="episodes-list">
-        {episodes.map((episode: any) => {
-          const { title, description, videoUrl, publishedAt, thumbnail } = episode.attributes;
-          const date = new Date(publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-          const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
-          const thumbUrl = thumbnail?.data?.attributes?.url
-            ? (thumbnail.data.attributes.url.startsWith('http')
-              ? thumbnail.data.attributes.url
-              : `${STRAPI_URL}${thumbnail.data.attributes.url}`)
-            : null;
+        {episodes.map((episode: Episode) => {
+          const date = formatDate(episode.publishedAt);
           return (
             <div class="episode-card reveal">
-              {videoUrl ? (
-                <a href={videoUrl} target="_blank" rel="noopener" class="episode-thumb-link">
-                  {thumbUrl ? (
-                    <img src={thumbUrl} alt={title} class="episode-thumb" loading="lazy" />
-                  ) : (
-                    <div class="episode-thumb-placeholder">
-                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    </div>
-                  )}
+              {episode.youtubeUrl ? (
+                <a href={episode.youtubeUrl} target="_blank" rel="noopener" class="episode-thumb-link">
+                  <div class="episode-thumb-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </div>
                 </a>
-              ) : thumbUrl ? (
-                <img src={thumbUrl} alt={title} class="episode-thumb" loading="lazy" />
               ) : null}
               <div class="episode-body">
                 <time class="episode-date">{date}</time>
-                <h3 class="episode-title">{title}</h3>
-                {description && <p class="episode-desc">{description}</p>}
-                {videoUrl && (
-                  <a href={videoUrl} target="_blank" rel="noopener" class="episode-link">
+                <h3 class="episode-title">{episode.title}</h3>
+                {episode.description && <p class="episode-desc">{episode.description}</p>}
+                {episode.youtubeUrl && (
+                  <a href={episode.youtubeUrl} target="_blank" rel="noopener" class="episode-link">
                     Regarder sur YouTube →
                   </a>
                 )}
@@ -78,6 +69,9 @@ const episodes = result?.data || [];
     padding: 4rem 0;
     color: var(--muted);
   }
+  .empty-state .btn {
+    margin-top: 1rem;
+  }
   .episodes-list {
     display: flex;
     flex-direction: column;
@@ -97,12 +91,6 @@ const episodes = result?.data || [];
   }
   .episode-thumb-link {
     flex-shrink: 0;
-  }
-  .episode-thumb {
-    width: 180px;
-    height: 101px;
-    object-fit: cover;
-    border-radius: 8px;
   }
   .episode-thumb-placeholder {
     width: 180px;
@@ -151,6 +139,6 @@ const episodes = result?.data || [];
   @media (max-width: 768px) {
     .episodes-section { padding: 2.5rem 1.5rem 4rem; }
     .episode-card { flex-direction: column; }
-    .episode-thumb, .episode-thumb-placeholder { width: 100%; height: auto; aspect-ratio: 16/9; }
+    .episode-thumb-placeholder { width: 100%; height: auto; aspect-ratio: 16/9; }
   }
 </style>

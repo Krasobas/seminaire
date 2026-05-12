@@ -12,9 +12,10 @@ interface Props {
 }
 
 const { title, description, overline, hero = true } = Astro.props;
+const fullTitle = title.includes('Séminaire') ? title : `${title} | Séminaire Orthodoxe Sainte-Geneviève`;
 ---
 
-<BaseLayout title={`${title} | Séminaire Orthodoxe Sainte-Geneviève`} description={description}>
+<BaseLayout title={fullTitle} description={description}>
   <Header />
   {hero && (
     <section class="page-hero">

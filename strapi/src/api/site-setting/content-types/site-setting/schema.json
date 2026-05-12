@@ -18,6 +18,11 @@
     "siteDescription": {
       "type": "text"
     },
+    "theme": {
+      "type": "enumeration",
+      "enum": ["light", "dark", "lent", "pascha", "christmas"],
+      "default": "light"
+    },
     "admissionsOpen": {
       "type": "boolean",
       "default": true
