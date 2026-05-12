@@ -1,7 +1,7 @@
 ---
-import { getLiturgySchedule, formatDate } from '../lib/strapi';
+import { getLiturgySchedule } from '../lib/strapi';
 
-const schedule = await getLiturgySchedule();
+const schedule = await getLiturgySchedule('Temps ordinaire', 7);
 ---
 
 <section id="liturgie" class="liturgy-section">
@@ -30,15 +30,16 @@ const schedule = await getLiturgySchedule();
 
         {schedule?.length > 0 && (
           <div class="schedule-card">
-            <h3>Prochaines célébrations</h3>
+            <h3>Horaires — Temps ordinaire</h3>
             <ul class="schedule-list">
               {schedule.map(item => (
                 <li>
-                  <span class="schedule-date">{formatDate(item.date, 'short')}</span>
-                  <span class="schedule-title">{item.title}</span>
+                  <span class="schedule-day">{item.title}</span>
+                  <span class="schedule-offices" set:html={item.offices || item.description || '—'} />
                 </li>
               ))}
             </ul>
+            <a href="/horaires-offices" class="schedule-link">Voir tous les horaires →</a>
           </div>
         )}
       </div>
@@ -65,9 +66,14 @@ const schedule = await getLiturgySchedule();
   .schedule-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
   .schedule-card h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; font-style: italic; color: var(--accent); margin-bottom: 1rem; }
   .schedule-list { list-style: none; }
-  .schedule-list li { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-  .schedule-date { color: var(--muted); }
-  .schedule-title { font-weight: 500; }
+  .schedule-list li { display: flex; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; align-items: baseline; }
+  .schedule-list li:last-child { border-bottom: none; }
+  .schedule-day { color: var(--fg); font-weight: 500; min-width: 5.5rem; }
+  .schedule-offices { color: var(--muted); line-height: 1.5; }
+  .schedule-offices :global(h5), .schedule-offices :global(p) { margin: 0; font-size: 0.85rem; font-weight: 400; }
+  .schedule-offices :global(strong) { font-weight: 500; }
+  .schedule-link { display: inline-block; margin-top: 1rem; font-size: 0.85rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+  .schedule-link:hover { text-decoration: underline; }
   .livestream-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; }
   .live-badge { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #c41e3a; margin-bottom: 1.5rem; }
   .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #c41e3a; animation: scrollPulse 1.5s ease-in-out infinite; }

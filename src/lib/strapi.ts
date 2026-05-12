@@ -82,6 +82,7 @@ export interface Episode {
   season: string;
   episodeNumber: number;
   publishedAt: string;
+  thumbnail: StrapiImage | null;
 }
 
 export interface Page {
@@ -95,8 +96,10 @@ export interface Page {
 export interface LiturgyScheduleItem {
   id: number;
   title: string;
+  period: string;
   date: string;
   time: string;
+  offices: string;
   description: string;
   location: string;
 }
@@ -149,6 +152,7 @@ function flattenEpisode(raw: any): Episode {
     season: a.season || '',
     episodeNumber: a.episodeNumber || 0,
     publishedAt: a.publishedAt || '',
+    thumbnail: a.thumbnail?.data ? flattenImage(a.thumbnail.data) : null,
   };
 }
 
@@ -168,8 +172,10 @@ function flattenLiturgySchedule(raw: any): LiturgyScheduleItem {
   return {
     id: raw.id,
     title: a.title || '',
+    period: a.period || 'Temps ordinaire',
     date: a.date || '',
     time: a.time || '',
+    offices: a.offices || '',
     description: a.description || '',
     location: a.location || '',
   };
@@ -236,8 +242,12 @@ export async function getPage(slug: string): Promise<Page | null> {
   return flattenPage(data.data[0]);
 }
 
-export async function getLiturgySchedule(limit = 10): Promise<LiturgyScheduleItem[]> {
-  const data = await fetchAPI(`/liturgy-schedules?sort=date:desc&pagination[limit]=${limit}&populate=*`);
+export async function getLiturgySchedule(period?: string, limit = 10): Promise<LiturgyScheduleItem[]> {
+  let path = `/liturgy-schedules?pagination[limit]=${limit}&populate=*`;
+  if (period) {
+    path += `&filters[period][$eq]=${encodeURIComponent(period)}`;
+  }
+  const data = await fetchAPI(path);
   if (!data?.data) return [];
   return data.data.map(flattenLiturgySchedule);
 }

@@ -15,12 +15,19 @@
       "type": "string",
       "required": true
     },
+    "period": {
+      "type": "enumeration",
+      "enum": ["Temps ordinaire", "Careme", "Premiere semaine", "Semaine Sainte", "Vacances"],
+      "default": "Temps ordinaire"
+    },
     "date": {
-      "type": "datetime",
-      "required": true
+      "type": "datetime"
     },
     "time": {
       "type": "string"
+    },
+    "offices": {
+      "type": "richtext"
     },
     "description": {
       "type": "text"

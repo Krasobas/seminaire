@@ -69,7 +69,7 @@ const hasMore = pagination ? pagination.page < pagination.pageCount : false;
         currentPage++;
         
         try {
-          const res = await fetch(`/api/articles?page=${currentPage}&pageSize=12`);
+          const res = await fetch(`/load-articles?page=${currentPage}&pageSize=12`);
           if (!res.ok) throw new Error('Fetch failed');
           const data = await res.json();
           

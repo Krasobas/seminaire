@@ -1,7 +1,11 @@
 ---
-import { getEpisodes, formatDate } from '../lib/strapi';
+import { getEpisodes, formatDate, getImageUrl } from '../lib/strapi';
 
 const episodes = await getEpisodes(5);
+const latestEpisode = episodes?.[0];
+const youtubeId = latestEpisode?.youtubeUrl
+  ? (latestEpisode.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/)?.[1] || null)
+  : null;
 ---
 
 <section id="emission" class="emission-section">
@@ -14,9 +18,29 @@ const episodes = await getEpisodes(5);
     <div class="emission-grid reveal">
       <div class="emission-hero">
         <div class="emission-video">
-          <div class="video-placeholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M8 5v14l11-7z"/></svg>
-          </div>
+          {youtubeId ? (
+            <div class="video-embed" style="aspect-ratio: 16/9;">
+              <iframe
+                src={`https://www.youtube.com/embed/${youtubeId}`}
+                title={latestEpisode?.title || 'Questions du cœur'}
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+          ) : latestEpisode?.thumbnail ? (
+            <a href={latestEpisode.youtubeUrl || '#'} target="_blank" rel="noopener" class="video-thumbnail-link">
+              <img src={getImageUrl(latestEpisode.thumbnail, 'medium')!} alt={latestEpisode.title} />
+              <div class="video-play-overlay">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </a>
+          ) : (
+            <div class="video-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          )}
         </div>
         <div class="emission-cta">
           <a href="https://www.youtube.com/@seminaireorthodoxe" target="_blank" rel="noopener" class="btn btn-dark">Voir sur YouTube →</a>
@@ -50,6 +74,14 @@ const episodes = await getEpisodes(5);
   .emission-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; }
   .emission-hero { display: flex; flex-direction: column; gap: 1.5rem; }
   .emission-video { border-radius: 16px; overflow: hidden; background: var(--card); border: 1px solid var(--border); }
+  .video-embed { position: relative; width: 100%; }
+  .video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+  .video-thumbnail-link { display: block; position: relative; aspect-ratio: 16/9; overflow: hidden; }
+  .video-thumbnail-link img { width: 100%; height: 100%; object-fit: cover; }
+  .video-play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); transition: background 0.3s ease; }
+  .video-thumbnail-link:hover .video-play-overlay { background: rgba(0,0,0,0.5); }
+  .video-play-overlay svg { filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); transition: transform 0.3s ease; }
+  .video-thumbnail-link:hover .video-play-overlay svg { transform: scale(1.15); }
   .video-placeholder { aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: var(--bg-alt); color: var(--accent); }
   .emission-cta { text-align: center; }
   .episodes { display: flex; flex-direction: column; }
