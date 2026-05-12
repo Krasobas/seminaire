@@ -65,10 +65,17 @@ index 2dadc1d..1572885 100644
  
    /* Body */
 diff --git a/src/lib/strapi.ts b/src/lib/strapi.ts
-index 7ed3a76..c9f1254 100644
+index 7ed3a76..93ac52f 100644
 --- a/src/lib/strapi.ts
 +++ b/src/lib/strapi.ts
-@@ -373,7 +373,7 @@ export async function getStaff(): Promise<StaffMember[]> {
+@@ -367,13 +367,13 @@ function flattenUniversity(raw: any): University {
+ }
+ 
+ export async function getStaff(): Promise<StaffMember[]> {
+-  const data = await fetchAPI(`/staff?populate=*&pagination[limit]=100`);
++  const data = await fetchAPI(`/staffs?populate=*&pagination[limit]=100`);
+   if (!data?.data) return [];
+   return data.data.map(flattenStaff);
  }
  
  export async function getAlumni(): Promise<AlumniMember[]> {
@@ -476,4 +483,17 @@ index 96d8d2e..ee7e31c 100644
 +    "pluralName": "alumnis",
      "displayName": "Alumni",
      "description": "Anciens élèves du séminaire"
+   },
+diff --git a/strapi/src/api/staff/content-types/staff/schema.json b/strapi/src/api/staff/content-types/staff/schema.json
+index ed0719c..c99367f 100644
+--- a/strapi/src/api/staff/content-types/staff/schema.json
++++ b/strapi/src/api/staff/content-types/staff/schema.json
+@@ -3,7 +3,7 @@
+   "collectionName": "staff_members",
+   "info": {
+     "singularName": "staff",
+-    "pluralName": "staff",
++    "pluralName": "staffs",
+     "displayName": "Staff",
+     "description": "Direction et formateurs du séminaire"
    },
