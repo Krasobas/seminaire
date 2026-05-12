@@ -20,7 +20,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir('seminaire-orthodoxe') {
-                    sh 'docker-compose build'
+                    sh 'docker compose build'
                 }
             }
         }
@@ -28,7 +28,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 dir('seminaire-orthodoxe') {
-                    sh 'docker-compose up -d --remove-orphans'
+                    sh 'docker compose up -d --remove-orphans'
                 }
             }
         }
@@ -66,7 +66,7 @@ pipeline {
 
     post {
         failure {
-            echo 'Deploy failed — check logs: docker-compose logs'
+            echo 'Deploy failed — check logs: docker compose logs'
         }
         cleanup {
             sh 'docker image prune -f'
