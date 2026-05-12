@@ -16,46 +16,46 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       transition: background 0.4s ease;
     }
 
-    .not-found-cross {
-      color: var(--accent);
-      opacity: 0.25;
-      margin-bottom: 2rem;
+    .not-found-logo {
+      width: 48px;
+      height: auto;
+      opacity: 0.35;
+      margin-bottom: 3rem;
     }
 
     .not-found-code {
       font-family: var(--font-display);
-      font-size: 6rem;
+      font-size: 5rem;
       font-weight: 400;
       color: var(--accent);
       line-height: 1;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .not-found-title {
       font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 500;
       color: var(--fg);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
 
     .not-found-text {
       font-family: var(--font-body);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--muted);
       line-height: 1.7;
-      max-width: 420px;
       margin-bottom: 2.5rem;
     }
 
     .not-found-home {
       font-family: var(--font-body);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
       letter-spacing: 0.04em;
       color: #fff;
       background: var(--accent);
-      padding: 0.65rem 2rem;
+      padding: 0.6rem 1.8rem;
       border-radius: 100px;
       text-decoration: none;
       transition: all 0.25s ease;
@@ -68,17 +68,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </style>
 
   <div class="not-found">
-    <svg class="not-found-cross" width="64" height="64" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5">
-      <line x1="50" y1="10" x2="50" y2="90"/>
-      <line x1="30" y1="30" x2="70" y2="30"/>
-      <line x1="35" y1="50" x2="65" y2="50"/>
-    </svg>
+    <img src="/logo.svg" alt="" class="not-found-logo" />
     <div class="not-found-code">404</div>
     <h1 class="not-found-title">Page non trouvée</h1>
-    <p class="not-found-text">
-      La page que vous cherchez n'existe pas ou a été déplacée.
-      Elle est peut-être en chemin vers la lumière.
-    </p>
+    <p class="not-found-text">La page que vous cherchez n'existe pas ou a été déplacée.</p>
     <a href="/" class="not-found-home">Retour à l'accueil</a>
   </div>
 </BaseLayout>

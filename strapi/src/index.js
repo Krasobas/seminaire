@@ -21,22 +21,23 @@ module.exports = {
       const existingActions = new Set(existingPerms.map((p) => p.action));
 
       // Content types that need public read access
-      const contentTypes = [
-        'article',
-        'episode',
-        'liturgy-schedule',
-        'page',
-        'site-setting',
-      ];
-      const methods = ['find', 'findOne'];
+      // Collection types have find + findOne; single types only have find
+      const collectionTypes = ['article', 'episode', 'liturgy-schedule', 'page'];
+      const singleTypes = ['site-setting'];
 
       const newActions = [];
-      for (const ct of contentTypes) {
-        for (const method of methods) {
+      for (const ct of collectionTypes) {
+        for (const method of ['find', 'findOne']) {
           const action = `api::${ct}.${ct}.${method}`;
           if (!existingActions.has(action)) {
             newActions.push(action);
           }
+        }
+      }
+      for (const ct of singleTypes) {
+        const action = `api::${ct}.${ct}.find`;
+        if (!existingActions.has(action)) {
+          newActions.push(action);
         }
       }
 
