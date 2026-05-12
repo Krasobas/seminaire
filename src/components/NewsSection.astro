@@ -24,7 +24,7 @@ const hasContent = articles && articles.length > 0;
                   <img src={imgUrl} alt={article.title} loading="lazy" />
                 ) : (
                   <div class="news-card-image-placeholder">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M21 15l-5-5L5 21"/></svg>
+                    <img src="/logo.svg" alt="" class="placeholder-logo" />
                   </div>
                 )}
               </div>
@@ -122,8 +122,12 @@ const hasContent = articles && articles.length > 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--muted);
-    opacity: 0.25;
+  }
+  .news-card-image-placeholder .placeholder-logo {
+    width: 40px;
+    height: auto;
+    opacity: 0.12;
+    filter: grayscale(40%);
   }
 
   /* Body */

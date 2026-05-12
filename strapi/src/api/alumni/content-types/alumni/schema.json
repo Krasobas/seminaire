@@ -3,7 +3,7 @@
   "collectionName": "alumni_members",
   "info": {
     "singularName": "alumni",
-    "pluralName": "alumni",
+    "pluralName": "alumnis",
     "displayName": "Alumni",
     "description": "Anciens élèves du séminaire"
   },

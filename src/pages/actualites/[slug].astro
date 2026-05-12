@@ -4,6 +4,7 @@ import { getArticle, getImageUrl, formatDate } from '../../lib/strapi';
 
 const { slug } = Astro.params;
 const article = await getArticle(slug!);
+const imageUrl = getImageUrl(article.image, 'large');
 
 if (!article) {
   return Astro.redirect('/404');
@@ -12,11 +13,6 @@ if (!article) {
 
 <PageLayout title={article.title} overline={article.category || 'Actualité'} description={article.excerpt || article.content?.substring(0, 160)} hero={false}>
   <article class="article-page">
-    {getImageUrl(article.image, 'large') ? (
-      <div class="article-hero-image">
-        <img src={getImageUrl(article.image, 'large')!} alt={article.title} />
-      </div>
-    ) : null}
     <div class="article-header container">
       {article.category && <span class="article-category">{article.category}</span>}
       <h1 class="article-title">{article.title}</h1>
@@ -24,6 +20,15 @@ if (!article) {
         <time>{formatDate(article.publishedAt)}</time>
       </div>
     </div>
+    {imageUrl ? (
+      <div class="article-image-container">
+        <img src={imageUrl} alt={article.title} />
+      </div>
+    ) : (
+      <div class="article-image-placeholder">
+        <img src="/logo.svg" alt="" class="placeholder-logo" />
+      </div>
+    )}
     <div class="article-body container" set:html={article.content} />
     <div class="article-back container">
       <a href="/actualites" class="btn btn-light">← Toutes les actualités</a>
@@ -32,21 +37,10 @@ if (!article) {
 </PageLayout>
 
 <style>
-  .article-hero-image {
-    width: 100%;
-    max-height: 400px;
-    overflow: hidden;
-    margin-top: 72px;
-  }
-  .article-hero-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
   .article-header {
     max-width: 860px;
     margin: 0 auto;
-    padding: 3rem 3rem 0;
+    padding: 6rem 3rem 0;
   }
   .article-category {
     display: inline-block;
@@ -73,12 +67,43 @@ if (!article) {
   .article-meta {
     font-size: 0.85rem;
     color: var(--muted);
-    margin-bottom: 0.5rem;
+    margin-bottom: 2rem;
   }
+
+  /* Contained centered image */
+  .article-image-container {
+    max-width: 780px;
+    margin: 0 auto 2rem;
+    padding: 0 3rem;
+  }
+  .article-image-container img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Logo placeholder when no image */
+  .article-image-placeholder {
+    max-width: 780px;
+    margin: 0 auto 2rem;
+    padding: 0 3rem;
+    min-height: 280px;
+    border-radius: 12px;
+    background: var(--bg-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .placeholder-logo {
+    width: 80px;
+    height: auto;
+    opacity: 0.08;
+  }
+
   .article-body {
     max-width: 860px;
     margin: 0 auto;
-    padding: 2.5rem 3rem 3rem;
+    padding: 1rem 3rem 3rem;
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.85;
@@ -125,8 +150,10 @@ if (!article) {
     padding: 0 3rem 4rem;
   }
   @media (max-width: 768px) {
-    .article-header { padding: 2rem 1.5rem 0; }
-    .article-body { padding: 1.5rem 1.5rem 2rem; }
+    .article-header { padding: 4rem 1.5rem 0; }
+    .article-image-container { padding: 0 1.5rem; }
+    .article-image-placeholder { padding: 0 1.5rem; }
+    .article-body { padding: 1rem 1.5rem 2rem; }
     .article-back { padding: 0 1.5rem 3rem; }
   }
 </style>

@@ -100,7 +100,8 @@
    ═══════════════════════════════════════════════ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 body {
   font-family: var(--font-body);
   font-size: 16px;
@@ -108,7 +109,9 @@ body {
   color: var(--fg);
   background: var(--bg);
   transition: background 0.4s ease, color 0.4s ease;
+  scrollbar-width: none;
 }
+body::-webkit-scrollbar { display: none; }
 a { color: inherit; }
 img { max-width: 100%; height: auto; display: block; }
 

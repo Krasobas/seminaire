@@ -1,0 +1,479 @@
+diff --git a/.gitignore b/.gitignore
+index 150f99d..6cd8b0f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -23,6 +23,4 @@ Thumbs.db
+ # Docker
+ *.tar.gz
+ 
+-migration-data.json
+-
+-patch
+\ No newline at end of file
++migration-data.json
+\ No newline at end of file
+diff --git a/src/components/Header.astro b/src/components/Header.astro
+index 19a24a4..7983808 100644
+--- a/src/components/Header.astro
++++ b/src/components/Header.astro
+@@ -102,9 +102,16 @@ const navItems = [
+     background: var(--nav-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+     transition: background 0.4s ease;
+   }
+-  .nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--fg); }
+-  .nav-logo img { width: 126px; height: auto; filter: var(--logo-filter, none); }
+-  .nav-logo-text { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; }
++  .nav-logo {
++    display: flex; align-items: center; gap: 0.75rem;
++    text-decoration: none; color: var(--fg);
++    margin-bottom: -18px; position: relative; z-index: 101;
++  }
++  .nav-logo img { height: 90px; width: auto; filter: var(--logo-filter, none); }
++  .nav-logo-text {
++    font-family: var(--font-display); font-size: 1.05rem; font-weight: 500;
++    align-self: center; margin-top: -8px;
++  }
+ 
+   .nav-center { display: flex; gap: 0; align-items: center; }
+   .nav-center > a {
+diff --git a/src/components/NewsSection.astro b/src/components/NewsSection.astro
+index 2dadc1d..1572885 100644
+--- a/src/components/NewsSection.astro
++++ b/src/components/NewsSection.astro
+@@ -24,7 +24,7 @@ const hasContent = articles && articles.length > 0;
+                   <img src={imgUrl} alt={article.title} loading="lazy" />
+                 ) : (
+                   <div class="news-card-image-placeholder">
+-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M21 15l-5-5L5 21"/></svg>
++                    <img src="/logo.svg" alt="" class="placeholder-logo" />
+                   </div>
+                 )}
+               </div>
+@@ -122,8 +122,12 @@ const hasContent = articles && articles.length > 0;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+-    color: var(--muted);
+-    opacity: 0.25;
++  }
++  .news-card-image-placeholder .placeholder-logo {
++    width: 40px;
++    height: auto;
++    opacity: 0.12;
++    filter: grayscale(40%);
+   }
+ 
+   /* Body */
+diff --git a/src/lib/strapi.ts b/src/lib/strapi.ts
+index 7ed3a76..c9f1254 100644
+--- a/src/lib/strapi.ts
++++ b/src/lib/strapi.ts
+@@ -373,7 +373,7 @@ export async function getStaff(): Promise<StaffMember[]> {
+ }
+ 
+ export async function getAlumni(): Promise<AlumniMember[]> {
+-  const data = await fetchAPI(`/alumni?populate=*&pagination[limit]=100`);
++  const data = await fetchAPI(`/alumnis?populate=*&pagination[limit]=100`);
+   if (!data?.data) return [];
+   return data.data.map(flattenAlumni);
+ }
+diff --git a/src/pages/actualites/[slug].astro b/src/pages/actualites/[slug].astro
+index c018c93..0f09378 100644
+--- a/src/pages/actualites/[slug].astro
++++ b/src/pages/actualites/[slug].astro
+@@ -4,6 +4,7 @@ import { getArticle, getImageUrl, formatDate } from '../../lib/strapi';
+ 
+ const { slug } = Astro.params;
+ const article = await getArticle(slug!);
++const imageUrl = getImageUrl(article.image, 'large');
+ 
+ if (!article) {
+   return Astro.redirect('/404');
+@@ -12,11 +13,6 @@ if (!article) {
+ 
+ <PageLayout title={article.title} overline={article.category || 'Actualité'} description={article.excerpt || article.content?.substring(0, 160)} hero={false}>
+   <article class="article-page">
+-    {getImageUrl(article.image, 'large') ? (
+-      <div class="article-hero-image">
+-        <img src={getImageUrl(article.image, 'large')!} alt={article.title} />
+-      </div>
+-    ) : null}
+     <div class="article-header container">
+       {article.category && <span class="article-category">{article.category}</span>}
+       <h1 class="article-title">{article.title}</h1>
+@@ -24,6 +20,15 @@ if (!article) {
+         <time>{formatDate(article.publishedAt)}</time>
+       </div>
+     </div>
++    {imageUrl ? (
++      <div class="article-image-container">
++        <img src={imageUrl} alt={article.title} />
++      </div>
++    ) : (
++      <div class="article-image-placeholder">
++        <img src="/logo.svg" alt="" class="placeholder-logo" />
++      </div>
++    )}
+     <div class="article-body container" set:html={article.content} />
+     <div class="article-back container">
+       <a href="/actualites" class="btn btn-light">← Toutes les actualités</a>
+@@ -32,21 +37,10 @@ if (!article) {
+ </PageLayout>
+ 
+ <style>
+-  .article-hero-image {
+-    width: 100%;
+-    max-height: 400px;
+-    overflow: hidden;
+-    margin-top: 72px;
+-  }
+-  .article-hero-image img {
+-    width: 100%;
+-    height: 100%;
+-    object-fit: cover;
+-  }
+   .article-header {
+     max-width: 860px;
+     margin: 0 auto;
+-    padding: 3rem 3rem 0;
++    padding: 6rem 3rem 0;
+   }
+   .article-category {
+     display: inline-block;
+@@ -73,12 +67,43 @@ if (!article) {
+   .article-meta {
+     font-size: 0.85rem;
+     color: var(--muted);
+-    margin-bottom: 0.5rem;
++    margin-bottom: 2rem;
+   }
++
++  /* Contained centered image */
++  .article-image-container {
++    max-width: 780px;
++    margin: 0 auto 2rem;
++    padding: 0 3rem;
++  }
++  .article-image-container img {
++    width: 100%;
++    border-radius: 12px;
++    box-shadow: var(--shadow-hover);
++  }
++
++  /* Logo placeholder when no image */
++  .article-image-placeholder {
++    max-width: 780px;
++    margin: 0 auto 2rem;
++    padding: 0 3rem;
++    min-height: 280px;
++    border-radius: 12px;
++    background: var(--bg-alt);
++    display: flex;
++    align-items: center;
++    justify-content: center;
++  }
++  .placeholder-logo {
++    width: 80px;
++    height: auto;
++    opacity: 0.08;
++  }
++
+   .article-body {
+     max-width: 860px;
+     margin: 0 auto;
+-    padding: 2.5rem 3rem 3rem;
++    padding: 1rem 3rem 3rem;
+     font-family: var(--font-body);
+     font-size: 1rem;
+     line-height: 1.85;
+@@ -125,8 +150,10 @@ if (!article) {
+     padding: 0 3rem 4rem;
+   }
+   @media (max-width: 768px) {
+-    .article-header { padding: 2rem 1.5rem 0; }
+-    .article-body { padding: 1.5rem 1.5rem 2rem; }
++    .article-header { padding: 4rem 1.5rem 0; }
++    .article-image-container { padding: 0 1.5rem; }
++    .article-image-placeholder { padding: 0 1.5rem; }
++    .article-body { padding: 1rem 1.5rem 2rem; }
+     .article-back { padding: 0 1.5rem 3rem; }
+   }
+ </style>
+diff --git a/src/pages/actualites/index.astro b/src/pages/actualites/index.astro
+index f63171e..4726ab1 100644
+--- a/src/pages/actualites/index.astro
++++ b/src/pages/actualites/index.astro
+@@ -3,8 +3,10 @@ import PageLayout from '../../layouts/PageLayout.astro';
+ import { getAllArticles, getImageUrl, formatDate } from '../../lib/strapi';
+ import type { Article } from '../../lib/strapi';
+ 
+-const result = await getAllArticles();
++const result = await getAllArticles(1, 12);
+ const articles = result?.data || [];
++const pagination = result?.pagination;
++const hasMore = pagination ? pagination.page < pagination.pageCount : false;
+ ---
+ 
+ <PageLayout title="Actualités" overline="Séminaire Orthodoxe" description="Actualités et nouvelles du Séminaire Orthodoxe Russe Sainte-Geneviève">
+@@ -14,33 +16,116 @@ const articles = result?.data || [];
+         <p>Aucune actualité pour le moment.</p>
+       </div>
+     ) : (
+-      <div class="articles-grid">
+-        {articles.map((article: Article) => (
+-          <a href={`/actualites/${article.slug}`} class="article-card reveal">
+-            {getImageUrl(article.image, 'medium') ? (
+-              <div class="article-card-image">
+-                <img src={getImageUrl(article.image, 'medium')!} alt={article.title} loading="lazy" />
++      <>
++        <div class="articles-grid" id="articles-grid">
++          {articles.map((article: Article) => (
++            <a href={`/actualites/${article.slug}`} class="article-card reveal">
++              {getImageUrl(article.image, 'medium') ? (
++                <div class="article-card-image">
++                  <img src={getImageUrl(article.image, 'medium')!} alt={article.title} loading="lazy" />
++                </div>
++              ) : (
++                <div class="article-card-image article-card-image-placeholder">
++                  <img src="/logo.svg" alt="" class="placeholder-logo" />
++                </div>
++              )}
++              <div class="article-card-body">
++                <div class="article-card-meta">
++                  {article.category && <span class="article-card-category">{article.category}</span>}
++                  <time class="article-card-date">{formatDate(article.publishedAt)}</time>
++                </div>
++                <h3 class="article-card-title">{article.title}</h3>
++                {article.excerpt && <p class="article-card-excerpt">{article.excerpt}</p>}
+               </div>
+-            ) : (
+-              <div class="article-card-image article-card-image-placeholder">
+-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M21 15l-5-5L5 21"/></svg>
+-              </div>
+-            )}
+-            <div class="article-card-body">
+-              <div class="article-card-meta">
+-                {article.category && <span class="article-card-category">{article.category}</span>}
+-                <time class="article-card-date">{formatDate(article.publishedAt)}</time>
+-              </div>
+-              <h3 class="article-card-title">{article.title}</h3>
+-              {article.excerpt && <p class="article-card-excerpt">{article.excerpt}</p>}
++            </a>
++          ))}
++        </div>
++        {hasMore && (
++          <div class="load-more-sentinel" id="load-more-sentinel">
++            <div class="loading-spinner" id="loading-spinner">
++              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4 31.4" stroke-linecap="round"/></svg>
++              <span>Chargement...</span>
+             </div>
+-          </a>
+-        ))}
+-      </div>
++          </div>
++        )}
++      </>
+     )}
+   </section>
+ </PageLayout>
+ 
++<script>
++  const grid = document.getElementById('articles-grid');
++  const sentinel = document.getElementById('load-more-sentinel');
++  const spinner = document.getElementById('loading-spinner');
++  
++  if (grid && sentinel) {
++    let currentPage = 1;
++    let loading = false;
++    let allLoaded = false;
++
++    const observer = new IntersectionObserver(async (entries) => {
++      if (entries[0].isIntersecting && !loading && !allLoaded) {
++        loading = true;
++        currentPage++;
++        
++        try {
++          const res = await fetch(`/api/articles?page=${currentPage}&pageSize=12`);
++          if (!res.ok) throw new Error('Fetch failed');
++          const data = await res.json();
++          
++          if (data.articles && data.articles.length > 0) {
++            for (const article of data.articles) {
++              const card = document.createElement('a');
++              card.href = `/actualites/${article.slug}`;
++              card.className = 'article-card reveal';
++              
++              const imageHtml = article.imageUrl
++                ? `<div class="article-card-image"><img src="${article.imageUrl}" alt="${article.title}" loading="lazy" /></div>`
++                : `<div class="article-card-image article-card-image-placeholder"><img src="/logo.svg" alt="" class="placeholder-logo" /></div>`;
++              
++              const categoryHtml = article.category
++                ? `<span class="article-card-category">${article.category}</span>`
++                : '';
++              
++              const excerptHtml = article.excerpt
++                ? `<p class="article-card-excerpt">${article.excerpt}</p>`
++                : '';
++              
++              card.innerHTML = `
++                ${imageHtml}
++                <div class="article-card-body">
++                  <div class="article-card-meta">
++                    ${categoryHtml}
++                    <time class="article-card-date">${article.date}</time>
++                  </div>
++                  <h3 class="article-card-title">${article.title}</h3>
++                  ${excerptHtml}
++                </div>
++              `;
++              
++              grid.appendChild(card);
++            }
++            
++            if (!data.hasMore) {
++              allLoaded = true;
++              sentinel.remove();
++            }
++          } else {
++            allLoaded = true;
++            sentinel.remove();
++          }
++        } catch (e) {
++          console.error('Failed to load more articles:', e);
++        } finally {
++          loading = false;
++        }
++      }
++    }, { rootMargin: '200px' });
++
++    observer.observe(sentinel);
++  }
++</script>
++
+ <style>
+   .articles-section {
+     max-width: 1200px;
+@@ -92,8 +177,13 @@ const articles = result?.data || [];
+     display: flex;
+     align-items: center;
+     justify-content: center;
+-    color: var(--muted);
+-    opacity: 0.3;
++    min-height: 200px;
++  }
++  .article-card-image-placeholder .placeholder-logo {
++    width: 48px;
++    height: auto;
++    opacity: 0.12;
++    filter: grayscale(40%);
+   }
+   .article-card-body {
+     padding: 1.5rem;
+@@ -136,6 +226,28 @@ const articles = result?.data || [];
+     line-height: 1.6;
+     flex: 1;
+   }
++
++  /* Loading spinner */
++  .load-more-sentinel {
++    display: flex;
++    justify-content: center;
++    padding: 3rem 0 1rem;
++  }
++  .loading-spinner {
++    display: flex;
++    align-items: center;
++    gap: 0.75rem;
++    color: var(--muted);
++    font-size: 0.9rem;
++  }
++  .loading-spinner :global(.spin) {
++    animation: spin 1s linear infinite;
++  }
++  @keyframes spin {
++    from { transform: rotate(0deg); }
++    to { transform: rotate(360deg); }
++  }
++
+   @media (max-width: 768px) {
+     .articles-section { padding: 2.5rem 1.5rem 4rem; }
+     .articles-grid { grid-template-columns: 1fr; }
+diff --git a/src/pages/api/articles.ts b/src/pages/api/articles.ts
+new file mode 100644
+index 0000000..2a655c4
+--- /dev/null
++++ b/src/pages/api/articles.ts
+@@ -0,0 +1,36 @@
++import type { APIRoute } from 'astro';
++import { getAllArticles, getImageUrl, formatDate } from '../../lib/strapi';
++
++export const GET: APIRoute = async ({ url }) => {
++  const page = parseInt(url.searchParams.get('page') || '1');
++  const pageSize = parseInt(url.searchParams.get('pageSize') || '12');
++
++  try {
++    const result = await getAllArticles(page, pageSize);
++    const articles = result?.data || [];
++    const pagination = result?.pagination;
++
++    const formattedArticles = articles.map(article => ({
++      slug: article.slug,
++      title: article.title,
++      excerpt: article.excerpt || null,
++      category: article.category || null,
++      date: formatDate(article.publishedAt),
++      imageUrl: getImageUrl(article.image, 'medium') || null,
++    }));
++
++    return new Response(JSON.stringify({
++      articles: formattedArticles,
++      hasMore: pagination ? pagination.page < pagination.pageCount : false,
++      page,
++    }), {
++      status: 200,
++      headers: { 'Content-Type': 'application/json' },
++    });
++  } catch (error) {
++    return new Response(JSON.stringify({ error: 'Failed to fetch articles' }), {
++      status: 500,
++      headers: { 'Content-Type': 'application/json' },
++    });
++  }
++};
+diff --git a/src/styles/global.css b/src/styles/global.css
+index 1b72072..420d60f 100644
+--- a/src/styles/global.css
++++ b/src/styles/global.css
+@@ -100,7 +100,8 @@
+    ═══════════════════════════════════════════════ */
+ 
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+-html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
++html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; scrollbar-width: none; }
++html::-webkit-scrollbar { display: none; }
+ body {
+   font-family: var(--font-body);
+   font-size: 16px;
+@@ -108,7 +109,9 @@ body {
+   color: var(--fg);
+   background: var(--bg);
+   transition: background 0.4s ease, color 0.4s ease;
++  scrollbar-width: none;
+ }
++body::-webkit-scrollbar { display: none; }
+ a { color: inherit; }
+ img { max-width: 100%; height: auto; display: block; }
+ 
+diff --git a/strapi/src/api/alumni/content-types/alumni/schema.json b/strapi/src/api/alumni/content-types/alumni/schema.json
+index 96d8d2e..ee7e31c 100644
+--- a/strapi/src/api/alumni/content-types/alumni/schema.json
++++ b/strapi/src/api/alumni/content-types/alumni/schema.json
+@@ -3,7 +3,7 @@
+   "collectionName": "alumni_members",
+   "info": {
+     "singularName": "alumni",
+-    "pluralName": "alumni",
++    "pluralName": "alumnis",
+     "displayName": "Alumni",
+     "description": "Anciens élèves du séminaire"
+   },

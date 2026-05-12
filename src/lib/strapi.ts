@@ -373,7 +373,7 @@ export async function getStaff(): Promise<StaffMember[]> {
 }
 
 export async function getAlumni(): Promise<AlumniMember[]> {
-  const data = await fetchAPI(`/alumni?populate=*&pagination[limit]=100`);
+  const data = await fetchAPI(`/alumnis?populate=*&pagination[limit]=100`);
   if (!data?.data) return [];
   return data.data.map(flattenAlumni);
 }

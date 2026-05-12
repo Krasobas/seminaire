@@ -3,8 +3,10 @@ import PageLayout from '../../layouts/PageLayout.astro';
 import { getAllArticles, getImageUrl, formatDate } from '../../lib/strapi';
 import type { Article } from '../../lib/strapi';
 
-const result = await getAllArticles();
+const result = await getAllArticles(1, 12);
 const articles = result?.data || [];
+const pagination = result?.pagination;
+const hasMore = pagination ? pagination.page < pagination.pageCount : false;
 ---
 
 <PageLayout title="Actualités" overline="Séminaire Orthodoxe" description="Actualités et nouvelles du Séminaire Orthodoxe Russe Sainte-Geneviève">
@@ -14,32 +16,115 @@ const articles = result?.data || [];
         <p>Aucune actualité pour le moment.</p>
       </div>
     ) : (
-      <div class="articles-grid">
-        {articles.map((article: Article) => (
-          <a href={`/actualites/${article.slug}`} class="article-card reveal">
-            {getImageUrl(article.image, 'medium') ? (
-              <div class="article-card-image">
-                <img src={getImageUrl(article.image, 'medium')!} alt={article.title} loading="lazy" />
+      <>
+        <div class="articles-grid" id="articles-grid">
+          {articles.map((article: Article) => (
+            <a href={`/actualites/${article.slug}`} class="article-card reveal">
+              {getImageUrl(article.image, 'medium') ? (
+                <div class="article-card-image">
+                  <img src={getImageUrl(article.image, 'medium')!} alt={article.title} loading="lazy" />
+                </div>
+              ) : (
+                <div class="article-card-image article-card-image-placeholder">
+                  <img src="/logo.svg" alt="" class="placeholder-logo" />
+                </div>
+              )}
+              <div class="article-card-body">
+                <div class="article-card-meta">
+                  {article.category && <span class="article-card-category">{article.category}</span>}
+                  <time class="article-card-date">{formatDate(article.publishedAt)}</time>
+                </div>
+                <h3 class="article-card-title">{article.title}</h3>
+                {article.excerpt && <p class="article-card-excerpt">{article.excerpt}</p>}
               </div>
-            ) : (
-              <div class="article-card-image article-card-image-placeholder">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M21 15l-5-5L5 21"/></svg>
-              </div>
-            )}
-            <div class="article-card-body">
-              <div class="article-card-meta">
-                {article.category && <span class="article-card-category">{article.category}</span>}
-                <time class="article-card-date">{formatDate(article.publishedAt)}</time>
-              </div>
-              <h3 class="article-card-title">{article.title}</h3>
-              {article.excerpt && <p class="article-card-excerpt">{article.excerpt}</p>}
+            </a>
+          ))}
+        </div>
+        {hasMore && (
+          <div class="load-more-sentinel" id="load-more-sentinel">
+            <div class="loading-spinner" id="loading-spinner">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4 31.4" stroke-linecap="round"/></svg>
+              <span>Chargement...</span>
             </div>
-          </a>
-        ))}
-      </div>
+          </div>
+        )}
+      </>
     )}
   </section>
 </PageLayout>
+
+<script>
+  const grid = document.getElementById('articles-grid');
+  const sentinel = document.getElementById('load-more-sentinel');
+  const spinner = document.getElementById('loading-spinner');
+  
+  if (grid && sentinel) {
+    let currentPage = 1;
+    let loading = false;
+    let allLoaded = false;
+
+    const observer = new IntersectionObserver(async (entries) => {
+      if (entries[0].isIntersecting && !loading && !allLoaded) {
+        loading = true;
+        currentPage++;
+        
+        try {
+          const res = await fetch(`/api/articles?page=${currentPage}&pageSize=12`);
+          if (!res.ok) throw new Error('Fetch failed');
+          const data = await res.json();
+          
+          if (data.articles && data.articles.length > 0) {
+            for (const article of data.articles) {
+              const card = document.createElement('a');
+              card.href = `/actualites/${article.slug}`;
+              card.className = 'article-card reveal';
+              
+              const imageHtml = article.imageUrl
+                ? `<div class="article-card-image"><img src="${article.imageUrl}" alt="${article.title}" loading="lazy" /></div>`
+                : `<div class="article-card-image article-card-image-placeholder"><img src="/logo.svg" alt="" class="placeholder-logo" /></div>`;
+              
+              const categoryHtml = article.category
+                ? `<span class="article-card-category">${article.category}</span>`
+                : '';
+              
+              const excerptHtml = article.excerpt
+                ? `<p class="article-card-excerpt">${article.excerpt}</p>`
+                : '';
+              
+              card.innerHTML = `
+                ${imageHtml}
+                <div class="article-card-body">
+                  <div class="article-card-meta">
+                    ${categoryHtml}
+                    <time class="article-card-date">${article.date}</time>
+                  </div>
+                  <h3 class="article-card-title">${article.title}</h3>
+                  ${excerptHtml}
+                </div>
+              `;
+              
+              grid.appendChild(card);
+            }
+            
+            if (!data.hasMore) {
+              allLoaded = true;
+              sentinel.remove();
+            }
+          } else {
+            allLoaded = true;
+            sentinel.remove();
+          }
+        } catch (e) {
+          console.error('Failed to load more articles:', e);
+        } finally {
+          loading = false;
+        }
+      }
+    }, { rootMargin: '200px' });
+
+    observer.observe(sentinel);
+  }
+</script>
 
 <style>
   .articles-section {
@@ -92,8 +177,13 @@ const articles = result?.data || [];
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--muted);
-    opacity: 0.3;
+    min-height: 200px;
+  }
+  .article-card-image-placeholder .placeholder-logo {
+    width: 48px;
+    height: auto;
+    opacity: 0.12;
+    filter: grayscale(40%);
   }
   .article-card-body {
     padding: 1.5rem;
@@ -136,6 +226,28 @@ const articles = result?.data || [];
     line-height: 1.6;
     flex: 1;
   }
+
+  /* Loading spinner */
+  .load-more-sentinel {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 0 1rem;
+  }
+  .loading-spinner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .loading-spinner :global(.spin) {
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
   @media (max-width: 768px) {
     .articles-section { padding: 2.5rem 1.5rem 4rem; }
     .articles-grid { grid-template-columns: 1fr; }

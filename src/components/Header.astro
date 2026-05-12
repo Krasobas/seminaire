@@ -102,9 +102,16 @@ const navItems = [
     background: var(--nav-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
     transition: background 0.4s ease;
   }
-  .nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--fg); }
-  .nav-logo img { width: 126px; height: auto; filter: var(--logo-filter, none); }
-  .nav-logo-text { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; }
+  .nav-logo {
+    display: flex; align-items: center; gap: 0.75rem;
+    text-decoration: none; color: var(--fg);
+    margin-bottom: -18px; position: relative; z-index: 101;
+  }
+  .nav-logo img { height: 90px; width: auto; filter: var(--logo-filter, none); }
+  .nav-logo-text {
+    font-family: var(--font-display); font-size: 1.05rem; font-weight: 500;
+    align-self: center; margin-top: -8px;
+  }
 
   .nav-center { display: flex; gap: 0; align-items: center; }
   .nav-center > a {
