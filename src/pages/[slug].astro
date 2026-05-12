@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import { getPage } from '../lib/strapi';
+import { getPage, getImageUrl } from '../lib/strapi';
 
 const { slug } = Astro.params;
 const page = await getPage(slug!);
@@ -14,20 +14,18 @@ const page = await getPage(slug!);
     </div>
   </PageLayout>
 ) : (
-  <PageLayout title={page.attributes.title} description={page.attributes.content ? page.attributes.content.substring(0, 160) : undefined}>
+  <PageLayout title={page.title} description={page.content ? page.content.substring(0, 160) : undefined}>
     <article class="page-content container">
-      {page.attributes.image?.data?.attributes?.url && (
+      {getImageUrl(page.image, 'large') ? (
         <div class="page-image">
           <img
-            src={page.attributes.image.data.attributes.url.startsWith('http')
-              ? page.attributes.image.data.attributes.url
-              : `${import.meta.env.STRAPI_URL || 'http://strapi:1337'}${page.attributes.image.data.attributes.url}`}
-            alt={page.attributes.title}
+            src={getImageUrl(page.image, 'large')!}
+            alt={page.title}
             loading="lazy"
           />
         </div>
-      )}
-      <div class="page-body" set:html={page.attributes.content} />
+      ) : null}
+      <div class="page-body" set:html={page.content} />
     </article>
   </PageLayout>
 )}

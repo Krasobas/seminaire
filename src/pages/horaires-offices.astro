@@ -1,9 +1,8 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import { getLiturgySchedule } from '../lib/strapi';
+import { getLiturgySchedule, formatDate } from '../lib/strapi';
 
 const schedule = await getLiturgySchedule(20);
-const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
 ---
 
 <PageLayout title="Horaires des offices" overline="Vie liturgique" description="Horaires des offices et célébrations du Séminaire Orthodoxe Russe Sainte-Geneviève">
@@ -26,28 +25,26 @@ const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
       </div>
     ) : (
       <div class="schedule-list">
-        {schedule.map((item: any) => {
-          const { title, date, time, description, location } = item.attributes;
-          const formattedDate = new Date(date).toLocaleDateString('fr-FR', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-          });
-          return (
-            <div class="schedule-item reveal">
-              <div class="schedule-date">
-                <span class="schedule-day">{formattedDate}</span>
-                {time && <span class="schedule-time">{time}</span>}
-              </div>
-              <div class="schedule-info">
-                <h3 class="schedule-title">{title}</h3>
-                {location && <span class="schedule-location">{location}</span>}
-                {description && <p class="schedule-desc">{description}</p>}
-              </div>
+        {schedule.map(item => (
+          <div class="schedule-item reveal">
+            <div class="schedule-date">
+              <span class="schedule-day">
+                {new Date(item.date).toLocaleDateString('fr-FR', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+              {item.time && <span class="schedule-time">{item.time}</span>}
             </div>
-          );
-        })}
+            <div class="schedule-info">
+              <h3 class="schedule-title">{item.title}</h3>
+              {item.location && <span class="schedule-location">{item.location}</span>}
+              {item.description && <p class="schedule-desc">{item.description}</p>}
+            </div>
+          </div>
+        ))}
       </div>
     )}
   </section>

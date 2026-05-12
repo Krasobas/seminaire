@@ -22,3 +22,5 @@ Thumbs.db
 
 # Docker
 *.tar.gz
+
+migration-data.json

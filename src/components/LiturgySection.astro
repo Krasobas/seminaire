@@ -1,5 +1,5 @@
 ---
-import { getLiturgySchedule } from '../lib/strapi';
+import { getLiturgySchedule, formatDate } from '../lib/strapi';
 
 const schedule = await getLiturgySchedule();
 ---
@@ -34,7 +34,7 @@ const schedule = await getLiturgySchedule();
             <ul class="schedule-list">
               {schedule.map(item => (
                 <li>
-                  <span class="schedule-date">{new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}</span>
+                  <span class="schedule-date">{formatDate(item.date, 'short')}</span>
                   <span class="schedule-title">{item.title}</span>
                 </li>
               ))}

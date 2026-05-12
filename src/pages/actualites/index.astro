@@ -1,11 +1,10 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getAllArticles } from '../../lib/strapi';
+import { getAllArticles, getImageUrl, formatDate } from '../../lib/strapi';
+import type { Article } from '../../lib/strapi';
 
 const result = await getAllArticles();
 const articles = result?.data || [];
-const pagination = result?.meta?.pagination;
-const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
 ---
 
 <PageLayout title="Actualités" overline="Séminaire Orthodoxe" description="Actualités et nouvelles du Séminaire Orthodoxe Russe Sainte-Geneviève">
@@ -16,32 +15,27 @@ const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
       </div>
     ) : (
       <div class="articles-grid">
-        {articles.map((article: any) => {
-          const { title, slug, excerpt, category, publishedAt, image } = article.attributes;
-          const date = new Date(publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-          const imageUrl = image?.data?.attributes?.url
-            ? (image.data.attributes.url.startsWith('http')
-              ? image.data.attributes.url
-              : `${STRAPI_URL}${image.data.attributes.url}`)
-            : null;
-          return (
-            <a href={`/actualites/${slug}`} class="article-card reveal">
-              {imageUrl && (
-                <div class="article-card-image">
-                  <img src={imageUrl} alt={title} loading="lazy" />
-                </div>
-              )}
-              <div class="article-card-body">
-                <div class="article-card-meta">
-                  {category && <span class="article-card-category">{category}</span>}
-                  <time class="article-card-date">{date}</time>
-                </div>
-                <h3 class="article-card-title">{title}</h3>
-                {excerpt && <p class="article-card-excerpt">{excerpt}</p>}
+        {articles.map((article: Article) => (
+          <a href={`/actualites/${article.slug}`} class="article-card reveal">
+            {getImageUrl(article.image, 'medium') ? (
+              <div class="article-card-image">
+                <img src={getImageUrl(article.image, 'medium')!} alt={article.title} loading="lazy" />
               </div>
-            </a>
-          );
-        })}
+            ) : (
+              <div class="article-card-image article-card-image-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M21 15l-5-5L5 21"/></svg>
+              </div>
+            )}
+            <div class="article-card-body">
+              <div class="article-card-meta">
+                {article.category && <span class="article-card-category">{article.category}</span>}
+                <time class="article-card-date">{formatDate(article.publishedAt)}</time>
+              </div>
+              <h3 class="article-card-title">{article.title}</h3>
+              {article.excerpt && <p class="article-card-excerpt">{article.excerpt}</p>}
+            </div>
+          </a>
+        ))}
       </div>
     )}
   </section>
@@ -92,6 +86,14 @@ const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
   }
   .article-card:hover .article-card-image img {
     transform: scale(1.05);
+  }
+  .article-card-image-placeholder {
+    background: var(--bg-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    opacity: 0.3;
   }
   .article-card-body {
     padding: 1.5rem;

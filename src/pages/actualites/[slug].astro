@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { getArticle } from '../../lib/strapi';
+import { getArticle, getImageUrl, formatDate } from '../../lib/strapi';
 
 const { slug } = Astro.params;
 const article = await getArticle(slug!);
@@ -8,32 +8,23 @@ const article = await getArticle(slug!);
 if (!article) {
   return Astro.redirect('/404');
 }
-
-const { title, content, excerpt, category, publishedAt, image } = article.attributes;
-const date = new Date(publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
-const imageUrl = image?.data?.attributes?.url
-  ? (image.data.attributes.url.startsWith('http')
-    ? image.data.attributes.url
-    : `${STRAPI_URL}${image.data.attributes.url}`)
-  : null;
 ---
 
-<PageLayout title={title} overline={category || 'Actualité'} description={excerpt || content?.substring(0, 160)} hero={false}>
+<PageLayout title={article.title} overline={article.category || 'Actualité'} description={article.excerpt || article.content?.substring(0, 160)} hero={false}>
   <article class="article-page">
-    {imageUrl && (
+    {getImageUrl(article.image, 'large') ? (
       <div class="article-hero-image">
-        <img src={imageUrl} alt={title} />
+        <img src={getImageUrl(article.image, 'large')!} alt={article.title} />
       </div>
-    )}
+    ) : null}
     <div class="article-header container">
-      {category && <span class="article-category">{category}</span>}
-      <h1 class="article-title">{title}</h1>
+      {article.category && <span class="article-category">{article.category}</span>}
+      <h1 class="article-title">{article.title}</h1>
       <div class="article-meta">
-        <time>{date}</time>
+        <time>{formatDate(article.publishedAt)}</time>
       </div>
     </div>
-    <div class="article-body container" set:html={content} />
+    <div class="article-body container" set:html={article.content} />
     <div class="article-back container">
       <a href="/actualites" class="btn btn-light">← Toutes les actualités</a>
     </div>

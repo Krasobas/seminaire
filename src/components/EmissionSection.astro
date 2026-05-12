@@ -1,5 +1,5 @@
 ---
-import { getEpisodes } from '../lib/strapi';
+import { getEpisodes, formatDate } from '../lib/strapi';
 
 const episodes = await getEpisodes(5);
 ---
@@ -30,7 +30,7 @@ const episodes = await getEpisodes(5);
               <span class="episode-num">#{episodes.length - i}</span>
               <div class="episode-info">
                 <h4>{ep.title}</h4>
-                <span class="episode-date">{new Date(ep.publishedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
+                <span class="episode-date">{formatDate(ep.publishedAt, 'month-year')}</span>
               </div>
               <svg class="episode-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
