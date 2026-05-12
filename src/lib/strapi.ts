@@ -59,6 +59,30 @@ export async function getEpisodes(limit = 5) {
   return data?.data || [];
 }
 
+// --- All articles (listing page) ---
+export async function getAllArticles(page = 1, pageSize = 12) {
+  const data = await fetchAPI(`/articles?sort=publishedAt:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`);
+  return data || null;
+}
+
+// --- Single article by slug ---
+export async function getArticle(slug: string) {
+  const data = await fetchAPI(`/articles?filters[slug][$eq]=${slug}&populate=*`);
+  return data?.data?.[0] || null;
+}
+
+// --- All episodes (listing page) ---
+export async function getAllEpisodes(page = 1, pageSize = 12) {
+  const data = await fetchAPI(`/episodes?sort=publishedAt:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`);
+  return data || null;
+}
+
+// --- All pages (for navigation etc.) ---
+export async function getAllPages() {
+  const data = await fetchAPI(`/pages?pagination[limit]=100&populate=*`);
+  return data?.data || [];
+}
+
 // --- Site settings (global) ---
 export async function getSiteSettings() {
   const data = await fetchAPI(`/site-setting?populate=*`);

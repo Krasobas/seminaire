@@ -19,7 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir('seminaire-orthodoxe') {
-                    sh 'docker compose build --no-cache'
+                    sh 'docker compose build'
                 }
             }
         }

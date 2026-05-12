@@ -1,0 +1,69 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  overline?: string;
+  hero?: boolean;
+}
+
+const { title, description, overline, hero = true } = Astro.props;
+---
+
+<BaseLayout title={`${title} | Séminaire Orthodoxe Sainte-Geneviève`} description={description}>
+  <Header />
+  {hero && (
+    <section class="page-hero">
+      <div class="page-hero-inner">
+        {overline && <span class="page-hero-overline">{overline}</span>}
+        <h1 class="page-hero-title">{title}</h1>
+      </div>
+    </section>
+  )}
+  <main class="page-main">
+    <slot />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding-top: 72px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.4s ease;
+  }
+  .page-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 3rem 4rem;
+  }
+  .page-hero-overline {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .page-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    line-height: 1.15;
+  }
+  .page-main {
+    min-height: 50vh;
+  }
+  @media (max-width: 768px) {
+    .page-hero-inner { padding: 3.5rem 1.5rem 2.5rem; }
+  }
+</style>

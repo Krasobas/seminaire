@@ -1,0 +1,156 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { getAllEpisodes } from '../../lib/strapi';
+
+const result = await getAllEpisodes();
+const episodes = result?.data || [];
+---
+
+<PageLayout title="Questions du cœur" overline="Émission" description="Émission hebdomadaire consacrée à la découverte et à l'approfondissement de la foi chrétienne orthodoxe">
+  <section class="episodes-section container">
+    <p class="episodes-intro">
+      Une émission hebdomadaire consacrée à la découverte et à l'approfondissement de la foi chrétienne orthodoxe,
+      à travers des questions existentielles autant que des thèmes fondamentaux du catéchisme.
+    </p>
+    {episodes.length === 0 ? (
+      <div class="empty-state">
+        <p>Aucun épisode pour le moment.</p>
+      </div>
+    ) : (
+      <div class="episodes-list">
+        {episodes.map((episode: any) => {
+          const { title, description, videoUrl, publishedAt, thumbnail } = episode.attributes;
+          const date = new Date(publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+          const STRAPI_URL = import.meta.env.STRAPI_URL || 'http://strapi:1337';
+          const thumbUrl = thumbnail?.data?.attributes?.url
+            ? (thumbnail.data.attributes.url.startsWith('http')
+              ? thumbnail.data.attributes.url
+              : `${STRAPI_URL}${thumbnail.data.attributes.url}`)
+            : null;
+          return (
+            <div class="episode-card reveal">
+              {videoUrl ? (
+                <a href={videoUrl} target="_blank" rel="noopener" class="episode-thumb-link">
+                  {thumbUrl ? (
+                    <img src={thumbUrl} alt={title} class="episode-thumb" loading="lazy" />
+                  ) : (
+                    <div class="episode-thumb-placeholder">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </div>
+                  )}
+                </a>
+              ) : thumbUrl ? (
+                <img src={thumbUrl} alt={title} class="episode-thumb" loading="lazy" />
+              ) : null}
+              <div class="episode-body">
+                <time class="episode-date">{date}</time>
+                <h3 class="episode-title">{title}</h3>
+                {description && <p class="episode-desc">{description}</p>}
+                {videoUrl && (
+                  <a href={videoUrl} target="_blank" rel="noopener" class="episode-link">
+                    Regarder sur YouTube →
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </section>
+</PageLayout>
+
+<style>
+  .episodes-section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 4rem 3rem 6rem;
+  }
+  .episodes-intro {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    max-width: 680px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 4rem 0;
+    color: var(--muted);
+  }
+  .episodes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .episode-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.3s ease;
+  }
+  .episode-card:hover {
+    box-shadow: var(--shadow-hover);
+  }
+  .episode-thumb-link {
+    flex-shrink: 0;
+  }
+  .episode-thumb {
+    width: 180px;
+    height: 101px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .episode-thumb-placeholder {
+    width: 180px;
+    height: 101px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-alt);
+    border-radius: 8px;
+    color: var(--muted);
+  }
+  .episode-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .episode-date {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .episode-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--fg);
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+  }
+  .episode-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+  .episode-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .episode-link:hover { color: var(--burgundy); }
+  @media (max-width: 768px) {
+    .episodes-section { padding: 2.5rem 1.5rem 4rem; }
+    .episode-card { flex-direction: column; }
+    .episode-thumb, .episode-thumb-placeholder { width: 100%; height: auto; aspect-ratio: 16/9; }
+  }
+</style>
