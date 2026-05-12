@@ -65,11 +65,22 @@ pipeline {
     }
 
     post {
-        failure {
-            echo 'Deploy failed — check logs: docker compose logs'
-        }
-        cleanup {
-            sh 'docker image prune -f'
+        always {
+            script {
+                def status = currentBuild.currentResult
+                def emoji = status == 'SUCCESS' ? '✅' : status == 'FAILURE' ? '❌' : '⚠️'
+                def duration = currentBuild.durationString.replace(' and counting', '')
+                def buildInfo = """
+${emoji} *Seminaire* — #${currentBuild.number}
+━━━━━━━━━━━━━━━━━━━━
+📌 Status: *${status}*
+🕐 Started: ${new Date(currentBuild.startTimeInMillis).format('dd.MM.yyyy HH:mm:ss')}
+⏱ Duration: ${duration}
+━━━━━━━━━━━━━━━━━━━━
+🔗 [Open in Jenkins](${env.BUILD_URL})
+                """.trim()
+                telegramSend(message: buildInfo)
+            }
         }
     }
 }
