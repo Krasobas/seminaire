@@ -1,0 +1,20 @@
+{
+  "kind": "collectionType",
+  "collectionName": "staff_members",
+  "info": {
+    "singularName": "staff",
+    "pluralName": "staff",
+    "displayName": "Staff",
+    "description": "Direction et formateurs du séminaire"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "role": { "type": "string" },
+    "roleCategory": { "type": "enumeration", "enum": ["Administration", "Ancien"], "default": "Administration" },
+    "description": { "type": "richtext" },
+    "photo": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+  }
+}

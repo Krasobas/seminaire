@@ -1,0 +1,92 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { getUniversities, getImageUrl } from '../lib/strapi';
+import type { University } from '../lib/strapi';
+
+const universities = await getUniversities();
+---
+
+<PageLayout title="Parcours interne — Séminaire Orthodoxe Sainte-Geneviève">
+  <section class="page-section">
+    <div class="container">
+      <h1 class="page-title">Formation au cœur de la vie de <em>l'Église</em></h1>
+      <p class="page-intro">
+        Le parcours interne du Séminaire Orthodoxe Sainte-Geneviève offre une formation théologique
+        en partenariat avec plusieurs institutions universitaires parisiennes.
+      </p>
+
+      {universities.length > 0 ? (
+        <div class="university-grid">
+          {universities.map((uni: University) => {
+            const logoUrl = getImageUrl(uni.logo, 'medium');
+            return (
+              <div class="university-card">
+                <div class="university-card-logo">
+                  {logoUrl ? (
+                    <img src={logoUrl} alt={`Logo ${uni.name}`} loading="lazy" />
+                  ) : (
+                    <div class="university-card-placeholder">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 10l10-7 10 7"/><path d="M6 12v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8"/></svg>
+                    </div>
+                  )}
+                </div>
+                <div class="university-card-info">
+                  <h3 class="university-card-name">{uni.name}</h3>
+                  {uni.description && (
+                    <div class="university-card-desc" set:html={uni.description} />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="placeholder">
+          <p>Les informations sur les universités partenaires seront bientôt disponibles.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .page-intro {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+  .university-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+  .university-card {
+    background: var(--color-bg-secondary, #f8f6f3);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .university-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .university-card-logo {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 0.75rem;
+  }
+  .university-card-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .university-card-placeholder { color: var(--color-text-muted, #999); }
+  .university-card-info { flex: 1; }
+  .university-card-name { font-size: 1.2rem; margin: 0 0 0.75rem; }
+  .university-card-desc { font-size: 0.9rem; line-height: 1.6; }
+  .university-card-desc :global(p) { margin: 0 0 0.5rem; }
+</style>

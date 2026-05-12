@@ -284,4 +284,110 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
   return flattenSiteSettings(data.data);
 }
 
+// ═══════════════════════════════════════════════
+// Staff, Alumni, Seminaristes, Universities
+// ═══════════════════════════════════════════════
+
+export interface StaffMember {
+  id: number;
+  name: string;
+  role: string;
+  roleCategory: 'Administration' | 'Ancien';
+  description: string;
+  photo: StrapiImage | null;
+}
+
+export interface AlumniMember {
+  id: number;
+  name: string;
+  promotion: string;
+  description: string;
+  photo: StrapiImage | null;
+}
+
+export interface Seminariste {
+  id: number;
+  name: string;
+  year: string;
+  origin: string;
+  description: string;
+  photo: StrapiImage | null;
+}
+
+export interface University {
+  id: number;
+  name: string;
+  description: string;
+  logo: StrapiImage | null;
+}
+
+function flattenStaff(raw: any): StaffMember {
+  const a = raw.attributes || raw;
+  return {
+    id: raw.id,
+    name: a.name || '',
+    role: a.role || '',
+    roleCategory: a.roleCategory || 'Administration',
+    description: a.description || '',
+    photo: a.photo?.data ? flattenImage(a.photo.data) : null,
+  };
+}
+
+function flattenAlumni(raw: any): AlumniMember {
+  const a = raw.attributes || raw;
+  return {
+    id: raw.id,
+    name: a.name || '',
+    promotion: a.promotion || '',
+    description: a.description || '',
+    photo: a.photo?.data ? flattenImage(a.photo.data) : null,
+  };
+}
+
+function flattenSeminariste(raw: any): Seminariste {
+  const a = raw.attributes || raw;
+  return {
+    id: raw.id,
+    name: a.name || '',
+    year: a.year || '',
+    origin: a.origin || '',
+    description: a.description || '',
+    photo: a.photo?.data ? flattenImage(a.photo.data) : null,
+  };
+}
+
+function flattenUniversity(raw: any): University {
+  const a = raw.attributes || raw;
+  return {
+    id: raw.id,
+    name: a.name || '',
+    description: a.description || '',
+    logo: a.logo?.data ? flattenImage(a.logo.data) : null,
+  };
+}
+
+export async function getStaff(): Promise<StaffMember[]> {
+  const data = await fetchAPI(`/staff?populate=*&pagination[limit]=100`);
+  if (!data?.data) return [];
+  return data.data.map(flattenStaff);
+}
+
+export async function getAlumni(): Promise<AlumniMember[]> {
+  const data = await fetchAPI(`/alumni?populate=*&pagination[limit]=100`);
+  if (!data?.data) return [];
+  return data.data.map(flattenAlumni);
+}
+
+export async function getSeminaristes(): Promise<Seminariste[]> {
+  const data = await fetchAPI(`/seminaristes?populate=*&pagination[limit]=100`);
+  if (!data?.data) return [];
+  return data.data.map(flattenSeminariste);
+}
+
+export async function getUniversities(): Promise<University[]> {
+  const data = await fetchAPI(`/universities?populate=*&pagination[limit]=100`);
+  if (!data?.data) return [];
+  return data.data.map(flattenUniversity);
+}
+
 export default fetchAPI;

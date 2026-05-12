@@ -1,0 +1,80 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { getSeminaristes, getImageUrl } from '../lib/strapi';
+import type { Seminariste } from '../lib/strapi';
+
+const seminaristes = await getSeminaristes();
+---
+
+<PageLayout title="Nos séminaristes — Séminaire Orthodoxe Sainte-Geneviève">
+  <section class="page-section">
+    <div class="container">
+      <h1 class="page-title">Nos <em>séminaristes</em></h1>
+
+      {seminaristes.length > 0 ? (
+        <div class="people-grid">
+          {seminaristes.map((person: Seminariste) => {
+            const photoUrl = getImageUrl(person.photo, 'medium');
+            return (
+              <div class="person-card">
+                <div class="person-card-photo">
+                  {photoUrl ? (
+                    <img src={photoUrl} alt={person.name} loading="lazy" />
+                  ) : (
+                    <div class="person-card-placeholder">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                    </div>
+                  )}
+                </div>
+                <div class="person-card-info">
+                  <h3 class="person-card-name">{person.name}</h3>
+                  {person.year && <p class="person-card-meta">Année : {person.year}</p>}
+                  {person.origin && <p class="person-card-meta">Origine : {person.origin}</p>}
+                  {person.description && (
+                    <div class="person-card-desc" set:html={person.description} />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="placeholder">
+          <p>Les informations sur les séminaristes seront bientôt disponibles.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .people-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem;
+  }
+  .person-card {
+    background: var(--color-bg-secondary, #f8f6f3);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .person-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .person-card-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: var(--color-bg-tertiary, #e8e4df);
+  }
+  .person-card-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .person-card-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-text-muted, #999);
+  }
+  .person-card-info { padding: 1.25rem; }
+  .person-card-name { font-size: 1.15rem; margin: 0 0 0.25rem; }
+  .person-card-meta { font-size: 0.85rem; color: var(--color-accent, #8b6f47); margin: 0 0 0.5rem; }
+  .person-card-desc { font-size: 0.9rem; line-height: 1.5; }
+  .person-card-desc :global(p) { margin: 0 0 0.5rem; }
+</style>

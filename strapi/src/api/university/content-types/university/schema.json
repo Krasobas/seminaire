@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "universities",
+  "info": {
+    "singularName": "university",
+    "pluralName": "universities",
+    "displayName": "University",
+    "description": "Universités partenaires du parcours interne"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "description": { "type": "richtext" },
+    "logo": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+  }
+}

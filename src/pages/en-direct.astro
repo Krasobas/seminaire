@@ -1,0 +1,69 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { getSiteSettings } from '../lib/strapi';
+
+const settings = await getSiteSettings();
+const youtubeChannel = settings?.youtubeChannelUrl || 'https://www.youtube.com/@seminaireorthodoxe';
+---
+
+<PageLayout title="En direct — Séminaire Orthodoxe Sainte-Geneviève">
+  <section class="page-section">
+    <div class="container">
+      <h1 class="page-title">En <em>direct</em></h1>
+      <p class="page-intro">
+        Suivez les offices liturgiques et les événements du séminaire en direct sur notre chaîne YouTube.
+      </p>
+
+      <div class="live-container">
+        <div class="live-embed">
+          <iframe
+            src="https://www.youtube.com/embed/live_stream?channel=UCseminaireorthodoxe"
+            title="Séminaire Orthodoxe — En direct"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="live-info">
+          <p>Si le direct n'est pas disponible, retrouvez nos enregistrements sur notre chaîne YouTube.</p>
+          <a href={youtubeChannel} target="_blank" rel="noopener" class="btn btn-primary">
+            Chaîne YouTube →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .page-intro {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 700px;
+    margin-bottom: 2rem;
+  }
+  .live-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .live-embed {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .live-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .live-info {
+    text-align: center;
+    padding: 1rem;
+  }
+  .live-info p { margin-bottom: 1rem; color: var(--color-text-secondary, #666); }
+</style>

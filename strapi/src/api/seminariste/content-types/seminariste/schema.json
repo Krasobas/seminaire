@@ -1,0 +1,20 @@
+{
+  "kind": "collectionType",
+  "collectionName": "seminaristes",
+  "info": {
+    "singularName": "seminariste",
+    "pluralName": "seminaristes",
+    "displayName": "Séminariste",
+    "description": "Séminaristes actuels"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "year": { "type": "string" },
+    "origin": { "type": "string" },
+    "description": { "type": "richtext" },
+    "photo": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+  }
+}
