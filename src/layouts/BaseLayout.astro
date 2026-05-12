@@ -2,9 +2,10 @@
 interface Props {
   title: string;
   description?: string;
+  adminTheme?: string;
 }
 
-const { title, description = 'Séminaire Orthodoxe Russe Sainte-Geneviève — Formation du clergé en Europe occidentale' } = Astro.props;
+const { title, description = 'Séminaire Orthodoxe Russe Sainte-Geneviève — Formation du clergé en Europe occidentale', adminTheme = 'light' } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -13,6 +14,7 @@ const { title, description = 'Séminaire Orthodoxe Russe Sainte-Geneviève — F
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
+  <meta name="admin-theme" content={adminTheme} />
   <title>{title}</title>
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,23 +25,48 @@ const { title, description = 'Séminaire Orthodoxe Russe Sainte-Geneviève — F
   <slot />
 
   <script is:inline>
-    // Theme switcher
+    // Theme: admin sets seasonal theme via Strapi, user can override with light/dark
     (function() {
-      const saved = localStorage.getItem('theme') || 'light';
-      document.documentElement.setAttribute('data-theme', saved);
-      window.setTheme = function(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
+      var adminTheme = document.querySelector('meta[name="admin-theme"]')?.content || 'light';
+      var saved = localStorage.getItem('theme');
+      // Only light/dark are user choices; seasonal themes come from admin
+      var userThemes = ['light', 'dark'];
+      var theme = (saved && userThemes.indexOf(saved) !== -1) ? saved : adminTheme;
+      document.documentElement.setAttribute('data-theme', theme);
+
+      // Apply logo filter for dark/seasonal themes
+      function applyLogoFilter(t) {
+        var isDark = (t === 'dark');
+        document.documentElement.style.setProperty('--logo-filter', isDark ? 'brightness(0) invert(1) opacity(0.85)' : 'none');
+      }
+      applyLogoFilter(theme);
+
+      // Observe theme changes for logo filter
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          if (m.attributeName === 'data-theme') {
+            applyLogoFilter(document.documentElement.getAttribute('data-theme'));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+
+      // Expose toggleTheme globally (used by Header)
+      window.toggleTheme = function() {
+        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        var next = (current === 'light') ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
       };
     })();
 
     // Scroll reveal
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
         if (entry.isIntersecting) entry.target.classList.add('visible');
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
   </script>
 </body>
 </html>
