@@ -11,17 +11,23 @@ async function fetchAPI(path: string, options: RequestInit = {}) {
     headers['Authorization'] = `Bearer ${STRAPI_TOKEN}`;
   }
 
-  const res = await fetch(`${STRAPI_URL}/api${path}`, {
-    ...options,
-    headers,
-  });
+  try {
+    const res = await fetch(`${STRAPI_URL}/api${path}`, {
+      ...options,
+      headers,
+      signal: AbortSignal.timeout(8000),
+    });
 
-  if (!res.ok) {
-    console.error(`Strapi API error: ${res.status} ${res.statusText} for ${path}`);
+    if (!res.ok) {
+      console.error(`Strapi API error: ${res.status} ${res.statusText} for ${path}`);
+      return null;
+    }
+
+    return res.json();
+  } catch (err) {
+    console.error(`Strapi API unavailable: ${path}`, err instanceof Error ? err.message : err);
     return null;
   }
-
-  return res.json();
 }
 
 // --- News ---

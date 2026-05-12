@@ -11,7 +11,7 @@ services:
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
-      FRONTEND_URL: ${FRONTEND_URL}
+      FRONTEND_URL: ${FRONTEND_URL:-https://seminaire.krasobas.com}
     volumes:
       - /opt/seminaire/data/strapi-db:/data
       - /opt/seminaire/data/strapi-uploads:/app/public/uploads
@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     environment:
       STRAPI_URL: http://strapi:1337
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
     depends_on:
       - strapi
     networks:

@@ -24,16 +24,23 @@ const episodes = await getEpisodes(5);
       </div>
 
       <div class="episodes">
-        {episodes?.map((ep, i) => (
-          <a href={ep.youtubeUrl || '#'} class="episode-item" target="_blank" rel="noopener">
-            <span class="episode-num">#{episodes.length - i}</span>
-            <div class="episode-info">
-              <h4>{ep.title}</h4>
-              <span class="episode-date">{new Date(ep.publishedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
-            </div>
-            <svg class="episode-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        ))}
+        {episodes?.length > 0 ? (
+          episodes.map((ep, i) => (
+            <a href={ep.youtubeUrl || '#'} class="episode-item" target="_blank" rel="noopener">
+              <span class="episode-num">#{episodes.length - i}</span>
+              <div class="episode-info">
+                <h4>{ep.title}</h4>
+                <span class="episode-date">{new Date(ep.publishedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
+              </div>
+              <svg class="episode-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          ))
+        ) : (
+          <div class="episodes-placeholder">
+            <p>Les épisodes seront bientôt disponibles.</p>
+            <a href="https://www.youtube.com/@seminaireorthodoxe" target="_blank" rel="noopener" class="btn btn-light">Découvrir sur YouTube →</a>
+          </div>
+        )}
       </div>
     </div>
   </div>
@@ -55,5 +62,7 @@ const episodes = await getEpisodes(5);
   .episode-info h4 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 500; margin-bottom: 0.2rem; }
   .episode-date { font-size: 0.72rem; color: var(--muted); }
   .episode-arrow { color: var(--border-strong); transition: all 0.2s ease; flex-shrink: 0; }
+  .episodes-placeholder { text-align: center; padding: 2rem 0; }
+  .episodes-placeholder p { font-size: 0.95rem; color: var(--muted); margin-bottom: 1rem; }
   @media (max-width: 768px) { .emission-grid { grid-template-columns: 1fr; } }
 </style>

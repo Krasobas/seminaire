@@ -6,6 +6,14 @@ const navLinks = [
   { href: '#emission', label: 'Émission' },
   { href: '#visiter', label: 'Visiter' },
 ];
+
+const themes = [
+  { id: 'light', label: 'Clair', icon: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>' },
+  { id: 'dark', label: 'Sombre', icon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>' },
+  { id: 'lent', label: 'Carême', icon: '<path d="M12 2L2 7v15h8v-6h4v6h8V7L12 2z"/><path d="M12 7v5M12 14v3"/>' },
+  { id: 'pascha', label: 'Pâques', icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>' },
+  { id: 'christmas', label: 'Noël', icon: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
+];
 ---
 
 <nav>
@@ -18,12 +26,11 @@ const navLinks = [
   </div>
   <div class="nav-right">
     <div class="theme-switcher">
-      <button onclick="setTheme('light')" title="Thème clair" aria-label="Thème clair">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      </button>
-      <button onclick="setTheme('dark')" title="Thème sombre" aria-label="Thème sombre">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+      {themes.map(theme => (
+        <button onclick={`setTheme('${theme.id}')`} title={`Thème ${theme.label}`} aria-label={`Thème ${theme.label}`}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" set:html={theme.icon} />
+        </button>
+      ))}
     </div>
     <a href="#admissions" class="nav-cta">Admissions</a>
   </div>
@@ -54,7 +61,7 @@ const navLinks = [
   }
   .nav-center a:hover::after { width: 100%; }
   .nav-right { display: flex; align-items: center; gap: 1.5rem; }
-  .theme-switcher { display: flex; gap: 0.25rem; }
+  .theme-switcher { display: flex; gap: 0.15rem; }
   .theme-switcher button {
     background: none; border: none; cursor: pointer; color: var(--muted); padding: 0.3rem;
     border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center;

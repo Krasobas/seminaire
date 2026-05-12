@@ -3,6 +3,7 @@ import { getFeaturedArticle, getNews } from '../lib/strapi';
 
 const featured = await getFeaturedArticle();
 const articles = await getNews(5);
+const hasContent = featured || (articles && articles.length > 0);
 ---
 
 <section id="actualites" class="news-section">
@@ -12,30 +13,39 @@ const articles = await getNews(5);
       <h2 class="section-title">Vie du <em>séminaire</em></h2>
     </div>
 
-    <div class="news-grid reveal">
-      {featured && (
-        <a href={`/actualites/${featured.slug}`} class="news-featured">
-          <div class="news-featured-tag">{featured.category?.name || 'Actualité'}</div>
-          <h3>{featured.title}</h3>
-          <p>{featured.excerpt}</p>
-          <span class="news-date">{new Date(featured.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-        </a>
-      )}
-
-      <div class="news-list">
-        {articles?.filter(a => a.id !== featured?.id).map(item => (
-          <a href={`/actualites/${item.slug}`} class="news-item">
-            <span class="news-item-tag">{item.category?.name || 'Actualité'}</span>
-            <h4>{item.title}</h4>
-            <span class="news-date">{new Date(item.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+    {hasContent ? (
+      <div class="news-grid reveal">
+        {featured && (
+          <a href={`/actualites/${featured.slug}`} class="news-featured">
+            <div class="news-featured-tag">{featured.category || 'Actualité'}</div>
+            <h3>{featured.title}</h3>
+            <p>{featured.excerpt}</p>
+            <span class="news-date">{new Date(featured.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
           </a>
-        ))}
-      </div>
-    </div>
+        )}
 
-    <div class="news-more reveal">
-      <a href="/actualites" class="btn btn-light">Toutes les actualités →</a>
-    </div>
+        <div class="news-list">
+          {articles?.filter(a => a.id !== featured?.id).map(item => (
+            <a href={`/actualites/${item.slug}`} class="news-item">
+              <span class="news-item-tag">{item.category || 'Actualité'}</span>
+              <h4>{item.title}</h4>
+              <span class="news-date">{new Date(item.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class="news-placeholder reveal">
+        <p>Les actualités du séminaire seront bientôt disponibles.</p>
+        <a href="https://www.youtube.com/@seminaireorthodoxe" target="_blank" rel="noopener" class="btn btn-light">Suivez-nous sur YouTube →</a>
+      </div>
+    )}
+
+    {hasContent && (
+      <div class="news-more reveal">
+        <a href="/actualites" class="btn btn-light">Toutes les actualités →</a>
+      </div>
+    )}
   </div>
 </section>
 
@@ -54,5 +64,7 @@ const articles = await getNews(5);
   .news-item-tag { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.3rem; display: block; }
   .news-item h4 { font-family: var(--font-display); font-size: 1rem; font-weight: 500; margin-bottom: 0.3rem; }
   .news-more { text-align: center; margin-top: 3rem; }
+  .news-placeholder { text-align: center; padding: 3rem 0; }
+  .news-placeholder p { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.5rem; }
   @media (max-width: 768px) { .news-grid { grid-template-columns: 1fr; gap: 2rem; } }
 </style>
