@@ -15,7 +15,7 @@ async function fetchAPI(path: string, options: RequestInit = {}) {
     const res = await fetch(`${STRAPI_URL}/api${path}`, {
       ...options,
       headers,
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(2000),
     });
 
     if (!res.ok) {

@@ -79,13 +79,22 @@ pipeline {
     }
 
     post {
+        failure {
+            echo 'Deploy failed — check logs: docker compose logs'
+            sh 'docker logs seminaire-strapi --tail 100 2>&1 || true'
+            sh 'docker logs seminaire-astro --tail 50 2>&1 || true'
+            sh 'docker logs seminaire-nginx --tail 50 2>&1 || true'
+        }
+        cleanup {
+            sh 'docker image prune -f'
+        }
         always {
             script {
                 def status = currentBuild.currentResult
                 def emoji = status == 'SUCCESS' ? '✅' : status == 'FAILURE' ? '❌' : '⚠️'
                 def duration = currentBuild.durationString.replace(' and counting', '')
                 def buildInfo = """
-${emoji} *Bible App* — #${currentBuild.number}
+${emoji} *Seminaire* — #${currentBuild.number}
 ━━━━━━━━━━━━━━━━━━━━
 📌 Status: *${status}*
 🕐 Started: ${new Date(currentBuild.startTimeInMillis).format('dd.MM.yyyy HH:mm:ss')}
