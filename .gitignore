@@ -24,3 +24,5 @@ Thumbs.db
 *.tar.gz
 
 migration-data.json
+
+patch
