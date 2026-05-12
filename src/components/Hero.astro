@@ -1,0 +1,41 @@
+---
+
+---
+
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-bg-circle"></div>
+    <div class="hero-bg-circle"></div>
+    <div class="hero-bg-circle"></div>
+  </div>
+  <div class="hero-cross">
+    <img src="/logo.svg" alt="" width="80" height="98" />
+  </div>
+  <p class="hero-label">Patriarcat de Moscou · Diocèse de Chersonèse</p>
+  <h1>Le séminaire orthodoxe<br /><em>Sainte-Geneviève</em></h1>
+  <p class="hero-sub">Premier et unique établissement de formation du clergé de l'Église orthodoxe russe en Europe occidentale. Formation théologique, liturgique et pastorale au cœur de la France.</p>
+  <div class="hero-actions">
+    <a href="#presentation" class="btn btn-dark">Découvrir</a>
+    <a href="#admissions" class="btn btn-light">Admissions 2026–2027</a>
+  </div>
+  <div class="hero-scroll"><span>Découvrir</span><div class="scroll-line"></div></div>
+</section>
+
+<style>
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 8rem 2rem 4rem; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; }
+  .hero-bg-circle { position: absolute; width: 600px; height: 600px; border-radius: 50%; border: 1px solid rgba(196, 162, 78, 0.08); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .hero-bg-circle:nth-child(2) { width: 450px; height: 450px; border-color: rgba(196, 162, 78, 0.05); }
+  .hero-bg-circle:nth-child(3) { width: 300px; height: 300px; border-color: rgba(196, 162, 78, 0.03); }
+  .hero-cross { position: relative; z-index: 1; margin-bottom: 2rem; animation: fadeIn 1s ease-out 0.1s both; }
+  .hero-cross img { width: 80px; height: auto; opacity: 0.2; }
+  .hero-label { position: relative; z-index: 1; font-family: var(--font-body); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; animation: fadeUp 0.8s ease-out 0.3s both; }
+  .hero h1 { position: relative; z-index: 1; font-family: var(--font-display); font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 500; line-height: 1.12; letter-spacing: -0.02em; color: var(--fg); max-width: 800px; margin-bottom: 1.75rem; animation: fadeUp 0.8s ease-out 0.45s both; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-sub { position: relative; z-index: 1; font-size: 1.08rem; font-weight: 300; line-height: 1.75; color: var(--muted); max-width: 560px; margin-bottom: 2.5rem; animation: fadeUp 0.8s ease-out 0.6s both; }
+  .hero-actions { position: relative; z-index: 1; display: flex; gap: 1rem; align-items: center; animation: fadeUp 0.8s ease-out 0.75s both; }
+  .hero-scroll { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; animation: fadeIn 1s ease-out 1.2s both; }
+  .hero-scroll span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+  .scroll-line { width: 1px; height: 32px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+  @media (max-width: 768px) { .hero { padding: 7rem 1.5rem 3rem; } .hero-actions { flex-direction: column; width: 100%; } .hero-actions .btn { width: 100%; justify-content: center; } }
+</style>

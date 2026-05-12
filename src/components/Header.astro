@@ -1,0 +1,81 @@
+---
+const navLinks = [
+  { href: '#presentation', label: 'Présentation' },
+  { href: '#actualites', label: 'Actualités' },
+  { href: '#liturgie', label: 'Vie liturgique' },
+  { href: '#emission', label: 'Émission' },
+  { href: '#visiter', label: 'Visiter' },
+];
+---
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="/logo.svg" alt="Séminaire Orthodoxe Sainte-Geneviève" width="36" height="44" />
+    <span class="nav-logo-text">Sainte-Geneviève</span>
+  </a>
+  <div class="nav-center">
+    {navLinks.map(link => <a href={link.href}>{link.label}</a>)}
+  </div>
+  <div class="nav-right">
+    <div class="theme-switcher">
+      <button onclick="setTheme('light')" title="Thème clair" aria-label="Thème clair">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <button onclick="setTheme('dark')" title="Thème sombre" aria-label="Thème sombre">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+    <a href="#admissions" class="nav-cta">Admissions</a>
+  </div>
+  <button class="nav-mobile-toggle" aria-label="Menu" onclick="document.querySelector('.nav-center').classList.toggle('open')">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+</nav>
+
+<style>
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 72px;
+    display: flex; justify-content: space-between; align-items: center; padding: 0 4rem;
+    background: var(--nav-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+    transition: background 0.4s ease;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--fg); }
+  .nav-logo img { width: 36px; height: auto; }
+  .nav-logo-text { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; }
+  .nav-center { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-center a {
+    font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.04em; transition: color 0.2s ease; position: relative;
+  }
+  .nav-center a:hover { color: var(--fg); }
+  .nav-center a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px;
+    background: var(--accent); transition: width 0.25s ease;
+  }
+  .nav-center a:hover::after { width: 100%; }
+  .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+  .theme-switcher { display: flex; gap: 0.25rem; }
+  .theme-switcher button {
+    background: none; border: none; cursor: pointer; color: var(--muted); padding: 0.3rem;
+    border-radius: 6px; transition: color 0.2s, background 0.2s; display: flex; align-items: center;
+  }
+  .theme-switcher button:hover { color: var(--accent); background: var(--accent-soft); }
+  .nav-cta {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em;
+    color: #fff; background: var(--accent); padding: 0.5rem 1.3rem; border-radius: 100px;
+    text-decoration: none; transition: all 0.25s ease;
+  }
+  .nav-cta:hover { background: var(--burgundy); transform: translateY(-1px); }
+  .nav-mobile-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--fg); }
+  @media (max-width: 900px) {
+    nav { padding: 0 1.5rem; }
+    .nav-center {
+      display: none; position: absolute; top: 72px; left: 0; right: 0;
+      background: var(--nav-bg); backdrop-filter: blur(20px); flex-direction: column;
+      padding: 2rem; gap: 1.5rem; border-bottom: 1px solid var(--border);
+    }
+    .nav-center.open { display: flex; }
+    .nav-mobile-toggle { display: flex; }
+    .theme-switcher { display: none; }
+  }
+</style>

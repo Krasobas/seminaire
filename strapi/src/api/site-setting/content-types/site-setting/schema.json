@@ -1,0 +1,46 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": {
+    "singularName": "site-setting",
+    "pluralName": "site-settings",
+    "displayName": "Site Setting",
+    "description": "Paramètres globaux du site"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "default": "Séminaire Orthodoxe Sainte-Geneviève"
+    },
+    "siteDescription": {
+      "type": "text"
+    },
+    "admissionsOpen": {
+      "type": "boolean",
+      "default": true
+    },
+    "admissionsDeadline": {
+      "type": "string",
+      "default": "31 mai 2026"
+    },
+    "youtubeChannelUrl": {
+      "type": "string",
+      "default": "https://www.youtube.com/@seminaireorthodoxe"
+    },
+    "contactEmail": {
+      "type": "email"
+    },
+    "contactPhone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "text"
+    },
+    "helloAssoUrl": {
+      "type": "string"
+    }
+  }
+}

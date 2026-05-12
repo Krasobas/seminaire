@@ -1,0 +1,16 @@
+{
+  "name": "seminaire-orthodoxe",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Séminaire Orthodoxe Russe Sainte-Geneviève — Site officiel",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.0",
+    "@astrojs/node": "^8.3.0"
+  }
+}

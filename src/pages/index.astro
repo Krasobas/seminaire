@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import NewsSection from '../components/NewsSection.astro';
+import LiturgySection from '../components/LiturgySection.astro';
+import EmissionSection from '../components/EmissionSection.astro';
+import AdmissionsBanner from '../components/AdmissionsBanner.astro';
+import VisitSection from '../components/VisitSection.astro';
+import DonateSection from '../components/DonateSection.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+---
+
+<BaseLayout title="Séminaire Orthodoxe Russe Sainte-Geneviève">
+  <Header />
+  <main>
+    <Hero />
+    <NewsSection />
+    <LiturgySection />
+    <EmissionSection />
+    <AdmissionsBanner />
+    <VisitSection />
+    <DonateSection />
+  </main>
+  <Footer />
+</BaseLayout>

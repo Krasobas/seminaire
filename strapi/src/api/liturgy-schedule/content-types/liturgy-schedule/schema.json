@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "liturgy_schedules",
+  "info": {
+    "singularName": "liturgy-schedule",
+    "pluralName": "liturgy-schedules",
+    "displayName": "Liturgy Schedule",
+    "description": "Calendrier des célébrations liturgiques"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "datetime",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "location": {
+      "type": "enumeration",
+      "enum": ["Chapelle Sainte-Geneviève", "Église Notre-Dame de la Nativité"],
+      "default": "Chapelle Sainte-Geneviève"
+    },
+    "isLiveStreamed": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
