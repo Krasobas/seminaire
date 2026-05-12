@@ -187,3 +187,5 @@ cd strapi && npm install && npm run develop
 - `email` — email
 - `youtubeChannel` — string
 - `telegramChannel` — string
+
+
