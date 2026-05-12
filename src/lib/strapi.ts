@@ -367,7 +367,7 @@ function flattenUniversity(raw: any): University {
 }
 
 export async function getStaff(): Promise<StaffMember[]> {
-  const data = await fetchAPI(`/staff?populate=*&pagination[limit]=100`);
+  const data = await fetchAPI(`/staffs?populate=*&pagination[limit]=100`);
   if (!data?.data) return [];
   return data.data.map(flattenStaff);
 }
