@@ -13,8 +13,8 @@ services:
       JWT_SECRET: ${STRAPI_JWT_SECRET}
       FRONTEND_URL: ${FRONTEND_URL}
     volumes:
-      - ./data/strapi-db:/data
-      - ./data/strapi-uploads:/app/public/uploads
+      - /opt/seminaire/data/strapi-db:/data
+      - /opt/seminaire/data/strapi-uploads:/app/public/uploads
     networks:
       - internal
 
@@ -31,11 +31,9 @@ services:
       - internal
 
   nginx:
-    image: nginx:alpine
+    build: ./nginx
     container_name: seminaire-nginx
     restart: unless-stopped
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - astro
       - strapi
