@@ -15,7 +15,7 @@ async function fetchAPI(path: string, options: RequestInit = {}) {
     const res = await fetch(`${STRAPI_URL}/api${path}`, {
       ...options,
       headers,
-      signal: AbortSignal.timeout(2000),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) {
@@ -302,7 +302,7 @@ export interface StaffMember {
   id: number;
   name: string;
   role: string;
-  roleCategory: 'Administration' | 'Ancien';
+  roleCategory: string;
   description: string;
   photo: StrapiImage | null;
 }

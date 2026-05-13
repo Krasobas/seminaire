@@ -1,43 +1,90 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import PersonCard from '../components/PersonCard.astro';
 import { getStaff, getImageUrl } from '../lib/strapi';
 import type { StaffMember } from '../lib/strapi';
 
 const staff = await getStaff();
-const admin = staff.filter((s: StaffMember) => s.roleCategory === 'Administration');
-const anciens = staff.filter((s: StaffMember) => s.roleCategory === 'Ancien');
+
+// Split into three sections matching Wix layout
+const direction = staff.filter(
+  (s: StaffMember) =>
+    s.roleCategory === 'Administration' &&
+    (s.role === 'chancelier' || s.role === 'recteur')
+);
+const chancelier = direction.find((s: StaffMember) => s.role === 'chancelier');
+const recteur = direction.find((s: StaffMember) => s.role === 'recteur');
+
+const administration = staff.filter(
+  (s: StaffMember) =>
+    s.roleCategory === 'Administration' &&
+    s.role !== 'chancelier' &&
+    s.role !== 'recteur'
+);
+
+const anciens = staff.filter(
+  (s: StaffMember) => s.roleCategory === 'Ancien'
+);
 ---
 
-<PageLayout title="Direction et formateurs — Séminaire Orthodoxe Sainte-Geneviève">
-  <section class="page-section">
+<PageLayout
+  title="Direction et formateurs"
+  overline="Notre équipe"
+>
+  <section class="equipe-section">
     <div class="container">
-      <h1 class="page-title">Direction et <em>formateurs</em></h1>
+      {staff.length === 0 && (
+        <div class="equipe-placeholder">
+          <p>Les informations sur l'équipe seront bientôt disponibles.</p>
+        </div>
+      )}
 
-      {admin.length > 0 && (
-        <div class="people-section">
-          <h2 class="section-subtitle">Administration</h2>
-          <div class="people-grid">
-            {admin.map((person: StaffMember) => {
-              const photoUrl = getImageUrl(person.photo, 'medium');
+      {chancelier && (
+        <div class="equipe-featured-block">
+          <PersonCard
+            name={chancelier.name}
+            role="Chancelier"
+            roleDescription="Le chancelier du séminaire assure les contacts avec le Saint-Synode et les établissements synodaux, nomme tous les titulaires aux postes pédagogiques et administratifs, approuve la procédure d'admission des élèves, agrée les programmes des cours, surveille toutes les sphères de l'activité du séminaire, représente le séminaire auprès des autorités religieuses et civiles. Le chancelier est nommé par le Saint-Synode du patriarcat de Moscou."
+            description={chancelier.description}
+            photoUrl={getImageUrl(chancelier.photo, 'medium')}
+            photoAlt={chancelier.name}
+            featured={true}
+          />
+        </div>
+      )}
+
+      {recteur && (
+        <div class="equipe-featured-block">
+          <PersonCard
+            name={recteur.name}
+            role="Recteur"
+            roleDescription="Nommé par le Saint-Synode de l'Église orthodoxe russe, il dirige le processus académique ainsi que la vie quotidienne du séminaire et représente celui-ci dans ses relations avec les autres établissements d'enseignement. Il est président du Conseil académique et de la commission d'examen. Dans l'exercice de ses fonctions, il agit sous le contrôle du chancelier du séminaire."
+            description={recteur.description}
+            photoUrl={getImageUrl(recteur.photo, 'medium')}
+            photoAlt={recteur.name}
+            featured={true}
+          />
+        </div>
+      )}
+
+      {administration.length > 0 && (
+        <div class="equipe-group">
+          <h2 class="equipe-group-title">Administration</h2>
+          <div class="equipe-grid">
+            {administration.map((person: StaffMember) => {
+              const lines = (person.description || '').split('\n');
+              const titleLine = lines[0] || '';
+              const restLines = lines.slice(1).join('\n');
               return (
-                <div class="person-card">
-                  <div class="person-card-photo">
-                    {photoUrl ? (
-                      <img src={photoUrl} alt={person.name} loading="lazy" />
-                    ) : (
-                      <div class="person-card-placeholder">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
-                      </div>
-                    )}
-                  </div>
-                  <div class="person-card-info">
-                    <h3 class="person-card-name">{person.name}</h3>
-                    {person.role && <p class="person-card-role">{person.role}</p>}
-                    {person.description && (
-                      <div class="person-card-desc" set:html={person.description} />
-                    )}
-                  </div>
-                </div>
+                <PersonCard
+                  name={person.name}
+                  role={person.role}
+                  title={titleLine}
+                  description={restLines}
+                  photoUrl={getImageUrl(person.photo, 'small')}
+                  photoAlt={person.name}
+                  expandable={true}
+                />
               );
             })}
           </div>
@@ -45,39 +92,25 @@ const anciens = staff.filter((s: StaffMember) => s.roleCategory === 'Ancien');
       )}
 
       {anciens.length > 0 && (
-        <div class="people-section">
-          <h2 class="section-subtitle">Anciens</h2>
-          <div class="people-grid">
+        <div class="equipe-group">
+          <h2 class="equipe-group-title">Anciens chanceliers et recteurs</h2>
+          <div class="equipe-grid">
             {anciens.map((person: StaffMember) => {
-              const photoUrl = getImageUrl(person.photo, 'medium');
+              const lines = (person.description || '').split('\n');
+              const titleLine = lines[0] || '';
+              const restLines = lines.slice(1).join('\n');
               return (
-                <div class="person-card">
-                  <div class="person-card-photo">
-                    {photoUrl ? (
-                      <img src={photoUrl} alt={person.name} loading="lazy" />
-                    ) : (
-                      <div class="person-card-placeholder">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
-                      </div>
-                    )}
-                  </div>
-                  <div class="person-card-info">
-                    <h3 class="person-card-name">{person.name}</h3>
-                    {person.role && <p class="person-card-role">{person.role}</p>}
-                    {person.description && (
-                      <div class="person-card-desc" set:html={person.description} />
-                    )}
-                  </div>
-                </div>
+                <PersonCard
+                  name={person.name}
+                  role={person.role}
+                  title={titleLine}
+                  description={restLines}
+                  photoUrl={getImageUrl(person.photo, 'small')}
+                  photoAlt={person.name}
+                />
               );
             })}
           </div>
-        </div>
-      )}
-
-      {staff.length === 0 && (
-        <div class="placeholder">
-          <p>Les informations sur l'équipe seront bientôt disponibles.</p>
         </div>
       )}
     </div>
@@ -85,47 +118,51 @@ const anciens = staff.filter((s: StaffMember) => s.roleCategory === 'Ancien');
 </PageLayout>
 
 <style>
-  .people-section { margin-bottom: 3rem; }
-  .section-subtitle {
+  .equipe-section {
+    padding: 3rem 0 5rem;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  .equipe-placeholder {
+    text-align: center;
+    padding: 4rem 0;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+  .equipe-featured-block {
+    margin-bottom: 3rem;
+  }
+  .equipe-featured-block + .equipe-featured-block {
+    margin-top: -1rem;
+  }
+  .equipe-group {
+    margin-top: 3.5rem;
+  }
+  .equipe-group-title {
+    font-family: var(--font-display);
     font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--color-accent, #8b6f47);
+    font-weight: 500;
+    color: var(--fg);
+    margin: 0 0 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--accent);
+    letter-spacing: -0.01em;
   }
-  .people-grid {
+  .equipe-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.75rem;
   }
-  .person-card {
-    background: var(--color-bg-secondary, #f8f6f3);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+
+  @media (max-width: 768px) {
+    .equipe-section { padding: 2rem 0 3rem; }
+    .container { padding: 0 1.25rem; }
+    .equipe-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
   }
-  .person-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-  .person-card-photo {
-    width: 100%;
-    aspect-ratio: 3/4;
-    overflow: hidden;
-    background: var(--color-bg-tertiary, #e8e4df);
+  @media (max-width: 520px) {
+    .equipe-grid { grid-template-columns: 1fr; }
   }
-  .person-card-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .person-card-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text-muted, #999);
-  }
-  .person-card-info { padding: 1.25rem; }
-  .person-card-name { font-size: 1.15rem; margin: 0 0 0.25rem; }
-  .person-card-role { font-size: 0.9rem; color: var(--color-accent, #8b6f47); margin: 0 0 0.75rem; }
-  .person-card-desc { font-size: 0.9rem; line-height: 1.5; }
-  .person-card-desc :global(p) { margin: 0 0 0.5rem; }
 </style>

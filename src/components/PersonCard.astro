@@ -1,0 +1,325 @@
+---
+interface Props {
+  name: string;
+  role?: string;
+  title?: string;
+  description?: string;
+  photoUrl?: string;
+  photoAlt?: string;
+  featured?: boolean;
+  roleDescription?: string;
+  expandable?: boolean;
+}
+
+const {
+  name,
+  role,
+  title,
+  description = '',
+  photoUrl,
+  photoAlt,
+  featured = false,
+  roleDescription,
+  expandable = false,
+} = Astro.props;
+
+const uid = `person-${name.toLowerCase().replace(/[^a-z]/g, '')}-${Math.random().toString(36).slice(2, 6)}`;
+---
+
+{featured ? (
+  <div class="person-featured" id={uid}>
+    <div class="person-featured-photo">
+      {photoUrl ? (
+        <img src={photoUrl} alt={photoAlt || name} loading="lazy" />
+      ) : (
+        <div class="person-featured-placeholder">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+          </svg>
+        </div>
+      )}
+    </div>
+    <div class="person-featured-content">
+      <div class="person-featured-role-label">{role}</div>
+      {roleDescription && (
+        <p class="person-featured-role-desc">{roleDescription}</p>
+      )}
+      <h3 class="person-featured-name">{name}</h3>
+      {description && (
+        <div class="person-featured-details" id={`${uid}-details`}>
+          {description.split('\n').map((line) => (
+            line.trim() ? <p>{line}</p> : <br />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+) : (
+  <div class="person-card" id={uid}>
+    <div class="person-card-photo">
+      {photoUrl ? (
+        <img src={photoUrl} alt={photoAlt || name} loading="lazy" />
+      ) : (
+        <div class="person-card-placeholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+          </svg>
+        </div>
+      )}
+    </div>
+    <div class="person-card-body">
+      <h3 class="person-card-name">{name}</h3>
+      {title && <p class="person-card-title">{title}</p>}
+      {role && <p class="person-card-role">{role}</p>}
+      {description && expandable ? (
+        <div class="person-card-expandable">
+          <div class="person-card-details" id={`${uid}-details`} data-collapsed="true">
+            {description.split('\n').map((line) => (
+              line.trim() ? <p>{line}</p> : <br />
+            ))}
+          </div>
+          <button
+            class="person-card-toggle"
+            data-target={`${uid}-details`}
+            aria-expanded="false"
+          >
+            Voir plus
+          </button>
+        </div>
+      ) : description ? (
+        <div class="person-card-details">
+          {description.split('\n').map((line) => (
+            line.trim() ? <p>{line}</p> : <br />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  </div>
+)}
+
+<script>
+  function initPersonCards() {
+    document.querySelectorAll('.person-card-toggle').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (!targetId) return;
+        const details = document.getElementById(targetId);
+        if (!details) return;
+        const isCollapsed = details.getAttribute('data-collapsed') === 'true';
+        details.setAttribute('data-collapsed', isCollapsed ? 'false' : 'true');
+        btn.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
+        btn.textContent = isCollapsed ? 'Voir moins' : 'Voir plus';
+      });
+    });
+  }
+  // Run on initial load
+  initPersonCards();
+  // Re-run on Astro page transitions
+  document.addEventListener('astro:page-load', initPersonCards);
+</script>
+
+<style>
+  /* ═══ Featured (full-width) person card ═══ */
+  .person-featured {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    padding: 2.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: box-shadow 0.3s ease;
+  }
+  .person-featured:hover {
+    box-shadow: var(--shadow-hover);
+  }
+  .person-featured-photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-alt);
+  }
+  .person-featured-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .person-featured-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+  }
+  .person-featured-content {
+    padding-top: 0.5rem;
+  }
+  .person-featured-role-label {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-soft);
+    border-radius: 4px;
+  }
+  .person-featured-role-desc {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0 0 1.25rem;
+    max-width: 540px;
+  }
+  .person-featured-name {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--fg);
+    margin: 0 0 1rem;
+    letter-spacing: -0.01em;
+  }
+  .person-featured-details {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .person-featured-details p {
+    margin: 0 0 0.15rem;
+  }
+
+  /* ═══ Compact grid person card ═══ */
+  .person-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .person-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+  .person-card-photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--bg-alt);
+  }
+  .person-card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .person-card:hover .person-card-photo img {
+    transform: scale(1.03);
+  }
+  .person-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+  }
+  .person-card-body {
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
+  .person-card-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--fg);
+    margin: 0 0 0.2rem;
+  }
+  .person-card-title {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0 0 0.15rem;
+    line-height: 1.4;
+  }
+  .person-card-role {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0 0 0.75rem;
+    letter-spacing: 0.02em;
+  }
+  .person-card-details {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--muted);
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .person-card-details[data-collapsed="true"] {
+    max-height: 0;
+  }
+  .person-card-details[data-collapsed="false"] {
+    max-height: 500px;
+  }
+  .person-card-details p {
+    margin: 0 0 0.15rem;
+  }
+  .person-card-expandable {
+    margin-top: 0.25rem;
+  }
+  .person-card-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .person-card-toggle:hover {
+    opacity: 0.7;
+  }
+  .person-card-toggle::after {
+    content: '↓';
+    font-size: 0.7em;
+    transition: transform 0.3s ease;
+  }
+  .person-card-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+  }
+
+  /* ═══ Responsive ═══ */
+  @media (max-width: 768px) {
+    .person-featured {
+      grid-template-columns: 180px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+    .person-featured-name {
+      font-size: 1.3rem;
+    }
+  }
+  @media (max-width: 520px) {
+    .person-featured {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem;
+    }
+    .person-featured-photo {
+      max-width: 220px;
+      margin: 0 auto;
+    }
+  }
+</style>
