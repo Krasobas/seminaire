@@ -1,15 +1,24 @@
 ---
 import { getEpisodes, formatDate } from '../lib/strapi';
 
-const allEpisodes = await getEpisodes(30);
-const episodes = allEpisodes?.filter(ep => ep.youtubeUrl) || [];
-const latestEpisode = episodes[0];
-const restEpisodes = episodes.slice(1, 7);
+const PLAYLIST_VIDEO_IDS = new Set([
+  'N3fR6ZmzM8Y', '27hiUCTL63Q', '44DcNwlNT5Y', 'uDdjQ8LPS9Y',
+  'PtoFfIAPPyc', 'wKnTyiiv5sc', 'HNLB76oL42c', 'IDfu7GOmpok', 'bj7RNXVMswU',
+]);
 
 function extractYoutubeId(url: string): string | null {
+  if (!url) return null;
   const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
   return match ? match[1] : null;
 }
+
+const allEpisodes = await getEpisodes(30);
+const episodes = allEpisodes?.filter(ep => {
+  const ytId = extractYoutubeId(ep.youtubeUrl);
+  return ytId && PLAYLIST_VIDEO_IDS.has(ytId);
+}) || [];
+const latestEpisode = episodes[0];
+const restEpisodes = episodes.slice(1, 7);
 ---
 
 <section id="emission" class="emission-section">
