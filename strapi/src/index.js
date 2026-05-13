@@ -22,7 +22,7 @@ module.exports = {
 
       // Content types that need public read access
       // Collection types have find + findOne; single types only have find
-      const collectionTypes = ['article', 'episode', 'liturgy-schedule', 'page'];
+      const collectionTypes = ['article', 'episode', 'liturgy-schedule', 'page', 'staff', 'alumni', 'seminariste', 'university'];
       const singleTypes = ['site-setting'];
 
       const newActions = [];
