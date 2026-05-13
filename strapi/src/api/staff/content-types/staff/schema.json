@@ -15,6 +15,7 @@
     "role": { "type": "string" },
     "roleCategory": { "type": "enumeration", "enum": ["Administration", "Ancien"], "default": "Administration" },
     "description": { "type": "richtext" },
-    "photo": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+    "photo": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] },
+    "sortOrder": { "type": "integer", "default": 0 }
   }
 }

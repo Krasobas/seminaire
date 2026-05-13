@@ -6,6 +6,10 @@ import type { StaffMember } from '../lib/strapi';
 
 const staff = await getStaff();
 
+// Sort by sortOrder (lower = higher), fallback to id for stability
+const sortByOrder = (a: StaffMember, b: StaffMember) =>
+  (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.id - b.id;
+
 // Split into three sections matching Wix layout
 const direction = staff.filter(
   (s: StaffMember) =>
@@ -20,11 +24,11 @@ const administration = staff.filter(
     s.roleCategory === 'Administration' &&
     s.role !== 'chancelier' &&
     s.role !== 'recteur'
-);
+).sort(sortByOrder);
 
 const anciens = staff.filter(
   (s: StaffMember) => s.roleCategory === 'Ancien'
-);
+).sort(sortByOrder);
 ---
 
 <PageLayout

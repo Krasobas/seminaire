@@ -305,6 +305,7 @@ export interface StaffMember {
   roleCategory: string;
   description: string;
   photo: StrapiImage | null;
+  sortOrder: number;
 }
 
 export interface AlumniMember {
@@ -340,6 +341,7 @@ function flattenStaff(raw: any): StaffMember {
     roleCategory: a.roleCategory || 'Administration',
     description: a.description || '',
     photo: a.photo?.data ? flattenImage(a.photo.data) : null,
+    sortOrder: a.sortOrder ?? 0,
   };
 }
 
