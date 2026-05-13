@@ -29,23 +29,24 @@ const { title, description = 'Séminaire Orthodoxe Russe Sainte-Geneviève — F
     (function() {
       var adminTheme = document.querySelector('meta[name="admin-theme"]')?.content || 'light';
       var saved = localStorage.getItem('theme');
-      // Only light/dark are user choices; seasonal themes come from admin
       var userThemes = ['light', 'dark'];
       var theme = (saved && userThemes.indexOf(saved) !== -1) ? saved : adminTheme;
       document.documentElement.setAttribute('data-theme', theme);
 
-      // Apply logo filter for dark/seasonal themes
-      function applyLogoFilter(t) {
+      // Apply logo src for dark theme
+      function applyLogoSrc(t) {
         var isDark = (t === 'dark');
-        document.documentElement.style.setProperty('--logo-filter', isDark ? 'brightness(0) invert(1) opacity(0.85)' : 'none');
+        document.querySelectorAll('[data-logo]').forEach(function(img) {
+          img.src = isDark ? '/logo-dark.svg' : '/logo.svg';
+        });
       }
-      applyLogoFilter(theme);
+      applyLogoSrc(theme);
 
-      // Observe theme changes for logo filter
+      // Observe theme changes for logo src
       var observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(m) {
           if (m.attributeName === 'data-theme') {
-            applyLogoFilter(document.documentElement.getAttribute('data-theme'));
+            applyLogoSrc(document.documentElement.getAttribute('data-theme'));
           }
         });
       });

@@ -2,7 +2,17 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { getLiturgySchedule, formatDate } from '../lib/strapi';
 
-const schedule = await getLiturgySchedule(20);
+const periods = [
+  { key: '', label: 'Tous' },
+  { key: 'Temps ordinaire', label: 'Temps ordinaire' },
+  { key: 'Careme', label: 'Carême' },
+  { key: 'Premiere semaine', label: 'Première semaine' },
+  { key: 'Semaine Sainte', label: 'Semaine Sainte' },
+  { key: 'Vacances', label: 'Vacances' },
+];
+
+const currentPeriod = Astro.url.searchParams.get('period') || '';
+const schedule = await getLiturgySchedule(currentPeriod || undefined, 50);
 ---
 
 <PageLayout title="Horaires des offices" overline="Vie liturgique" description="Horaires des offices et célébrations du Séminaire Orthodoxe Russe Sainte-Geneviève">
@@ -19,30 +29,30 @@ const schedule = await getLiturgySchedule(20);
       </a>
     </div>
 
+    <div class="period-tabs">
+      {periods.map(p => (
+        <a
+          href={p.key ? `/horaires-offices?period=${encodeURIComponent(p.key)}` : '/horaires-offices'}
+          class:list={['period-tab', { active: currentPeriod === p.key }]}
+        >
+          {p.label}
+        </a>
+      ))}
+    </div>
+
     {schedule.length === 0 ? (
       <div class="empty-state">
-        <p>Aucun horaire publié pour le moment.</p>
+        <p>Aucun horaire publié pour cette période.</p>
       </div>
     ) : (
       <div class="schedule-list">
         {schedule.map(item => (
-          <div class="schedule-item reveal">
-            <div class="schedule-date">
-              <span class="schedule-day">
-                {new Date(item.date).toLocaleDateString('fr-FR', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
-              </span>
-              {item.time && <span class="schedule-time">{item.time}</span>}
-            </div>
-            <div class="schedule-info">
-              <h3 class="schedule-title">{item.title}</h3>
-              {item.location && <span class="schedule-location">{item.location}</span>}
-              {item.description && <p class="schedule-desc">{item.description}</p>}
-            </div>
+          <div class="schedule-day-card reveal">
+            <h3>{item.title}</h3>
+            {item.location && <p><strong>Lieu :</strong> {item.location}</p>}
+            {item.time && <p><strong>Heure :</strong> {item.time}</p>}
+            {item.description && <p>{item.description}</p>}
+            {item.content && <div set:html={item.content} />}
           </div>
         ))}
       </div>
@@ -64,7 +74,7 @@ const schedule = await getLiturgySchedule(20);
     max-width: 680px;
   }
   .youtube-link {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
   .empty-state {
     text-align: center;
@@ -76,57 +86,7 @@ const schedule = await getLiturgySchedule(20);
     flex-direction: column;
     gap: 0;
   }
-  .schedule-item {
-    display: flex;
-    gap: 2rem;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .schedule-item:first-child {
-    border-top: 1px solid var(--border);
-  }
-  .schedule-date {
-    flex-shrink: 0;
-    width: 220px;
-    display: flex;
-    flex-direction: column;
-  }
-  .schedule-day {
-    font-size: 0.88rem;
-    font-weight: 500;
-    color: var(--fg);
-    text-transform: capitalize;
-  }
-  .schedule-time {
-    font-size: 0.82rem;
-    color: var(--accent);
-    font-weight: 600;
-    margin-top: 0.25rem;
-  }
-  .schedule-info {
-    flex: 1;
-  }
-  .schedule-title {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--fg);
-    margin-bottom: 0.25rem;
-  }
-  .schedule-location {
-    display: inline-block;
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 0.5rem;
-  }
-  .schedule-desc {
-    font-size: 0.88rem;
-    color: var(--muted);
-    line-height: 1.6;
-  }
   @media (max-width: 768px) {
     .liturgy-section { padding: 2.5rem 1.5rem 4rem; }
-    .schedule-item { flex-direction: column; gap: 0.5rem; }
-    .schedule-date { width: auto; }
   }
 </style>

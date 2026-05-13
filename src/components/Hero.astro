@@ -8,7 +8,7 @@
     <div class="hero-bg-circle"></div>
   </div>
   <div class="hero-cross">
-    <img src="/logo.svg" alt="" width="80" height="98" />
+    <img src="/logo.svg" data-logo alt="" width="80" height="98" />
   </div>
   <p class="hero-label">Patriarcat de Moscou · Diocèse de Chersonèse</p>
   <h1>Le séminaire orthodoxe<br /><em>Sainte-Geneviève</em></h1>
@@ -26,7 +26,7 @@
   .hero-bg-circle:nth-child(2) { width: 450px; height: 450px; border-color: rgba(196, 162, 78, 0.05); }
   .hero-bg-circle:nth-child(3) { width: 300px; height: 300px; border-color: rgba(196, 162, 78, 0.03); }
   .hero-cross { position: relative; z-index: 1; margin-bottom: 2rem; animation: fadeIn 1s ease-out 0.1s both; }
-  .hero-cross img { width: 80px; height: auto; opacity: 0.2; filter: var(--logo-filter, none); }
+  .hero-cross img { width: 80px; height: auto; opacity: 0.2;  }
   .hero-label { position: relative; z-index: 1; font-family: var(--font-body); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; animation: fadeUp 0.8s ease-out 0.3s both; }
   .hero h1 { position: relative; z-index: 1; font-family: var(--font-display); font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 500; line-height: 1.12; letter-spacing: -0.02em; color: var(--fg); max-width: 800px; margin-bottom: 1.75rem; animation: fadeUp 0.8s ease-out 0.45s both; }
   .hero h1 em { font-style: italic; color: var(--accent); }
